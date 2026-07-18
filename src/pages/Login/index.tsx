@@ -2,11 +2,14 @@ import React, { useCallback, useState } from "react";
 import { View, Text, Input, Button } from "@tarojs/components";
 import Taro from "@tarojs/taro";
 import "./index.less";
+import Interrupt from "../Interrupt";
 
 const LoginPage: React.FC = () => {
   const [account, setAccount] = useState("");
   const [password, setPassword] = useState("");
-  const [focusedField, setFocusedField] = useState<"account" | "password" | null>(null);
+  const [focusedField, setFocusedField] = useState<
+    "account" | "password" | null
+  >(null);
 
   const handleLogin = useCallback(() => {
     Taro.navigateTo({
@@ -64,6 +67,39 @@ const LoginPage: React.FC = () => {
 
         <Button className="login-button" onClick={handleLogin}>
           登录
+        </Button>
+
+        <Button
+          className="login-button"
+          onClick={() => {
+            Taro.navigateTo({
+              url: "/pages/Interrupt/index",
+            });
+          }}
+        >
+          访谈中断
+        </Button>
+
+        <Button
+          className="login-button"
+          onClick={() => {
+            Taro.navigateTo({
+              url: "/pages/Interrupt/index",
+            });
+          }}
+        >
+          未通过甄别用户
+        </Button>
+
+        <Button
+          className="login-button"
+          onClick={() => {
+            Taro.navigateTo({
+              url: "/pages/Result/index",
+            });
+          }}
+        >
+          未通过甄别访谈
         </Button>
       </View>
     </View>
