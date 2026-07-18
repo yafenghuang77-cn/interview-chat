@@ -5,6 +5,7 @@
     "removeComments": false,
     "preserveConstEnums": true,
     "moduleResolution": "node",
+    "baseUrl": ".",
     "experimentalDecorators": true,
     "noImplicitAny": false,
     "allowSyntheticDefaultImports": true,
@@ -21,8 +22,7 @@
       "node_modules/@types"
     ],
     "paths": {
-      // TS5090 leading './'
-      "@/*": ["./src/*"]
+      "@/*": ["src/*"]
     }
   },
   "include": ["./src", "./types", "./config"],
