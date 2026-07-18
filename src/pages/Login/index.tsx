@@ -2,7 +2,6 @@ import React, { useCallback, useState } from "react";
 import { View, Text, Input, Button } from "@tarojs/components";
 import Taro from "@tarojs/taro";
 import "./index.less";
-import Interrupt from "../Interrupt";
 
 const LoginPage: React.FC = () => {
   const [account, setAccount] = useState("");
@@ -69,6 +68,17 @@ const LoginPage: React.FC = () => {
           登录
         </Button>
 
+                <Button
+          className="login-button"
+          onClick={() => {
+            Taro.navigateTo({
+              url: "/pages/FollowUpWaiting/index",
+            });
+          }}
+        >
+          等待下一题
+        </Button>
+
         <Button
           className="login-button"
           onClick={() => {
@@ -84,7 +94,7 @@ const LoginPage: React.FC = () => {
           className="login-button"
           onClick={() => {
             Taro.navigateTo({
-              url: "/pages/Interrupt/index",
+              url: "/pages/ScreeningResult/index",
             });
           }}
         >
@@ -95,11 +105,22 @@ const LoginPage: React.FC = () => {
           className="login-button"
           onClick={() => {
             Taro.navigateTo({
-              url: "/pages/Result/index",
+              url: "/pages/ScreeningInvalid/index",
             });
           }}
         >
           未通过甄别访谈
+        </Button>
+
+        <Button
+          className="login-button"
+          onClick={() => {
+            Taro.navigateTo({
+              url: "/pages/InterviewComplete/index",
+            });
+          }}
+        >
+          访谈完成
         </Button>
       </View>
     </View>
