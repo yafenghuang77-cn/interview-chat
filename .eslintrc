@@ -1,7 +1,43 @@
 {
-  "extends": ["taro/react"],
+  "parser": "@typescript-eslint/parser",
+  "parserOptions": {
+    "ecmaVersion": 2020,
+    "sourceType": "module",
+    "ecmaFeatures": {
+      "jsx": true
+    }
+  },
+  "extends": [
+    "taro/react",
+    "plugin:@typescript-eslint/recommended",
+    "plugin:react-hooks/recommended",
+    "prettier"
+  ],
+  "plugins": ["@typescript-eslint"],
   "rules": {
+    // React（Taro 使用新版 JSX 转换，无需引入 React）
     "react/jsx-uses-react": "off",
-    "react/react-in-jsx-scope": "off"
+    "react/react-in-jsx-scope": "off",
+
+    // TypeScript（蚂蚁金服规范）
+    "@typescript-eslint/no-explicit-any": "warn",             // 尽量避免 any，不强制报错
+    "@typescript-eslint/explicit-function-return-type": "off", // 允许推断返回类型
+    "@typescript-eslint/explicit-module-boundary-types": "off",// 允许推断导出类型
+    "@typescript-eslint/no-unused-vars": ["error", { "argsIgnorePattern": "^_" }],
+    "@typescript-eslint/no-non-null-assertion": "warn",       // 避免 ! 非空断言
+    "@typescript-eslint/consistent-type-imports": "error",    // 统一使用 import type
+    "@typescript-eslint/no-empty-function": "warn",
+    "@typescript-eslint/ban-ts-comment": [
+      "error",
+      { "ts-ignore": "allow-with-description" }              // ts-ignore 必须写原因
+    ],
+
+    // 通用（蚂蚁金服规范）
+    "no-console": ["warn", { "allow": ["warn", "error"] }],  // 禁止 console.log，允许 warn/error
+    "eqeqeq": ["error", "always", { "null": "ignore" }],     // 必须使用 ===
+    "prefer-const": "error",                                  // 优先使用 const
+    "no-var": "error",                                        // 禁止使用 var
+    "object-shorthand": "error",                              // 对象方法使用简写
+    "no-duplicate-imports": "error"                           // 禁止重复 import
   }
 }

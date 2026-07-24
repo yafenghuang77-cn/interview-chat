@@ -1,0 +1,18 @@
+# 构建产物
+dist/
+lib/
+
+# 依赖
+node_modules/
+
+# Git
+.git/
+.husky/
+
+# 配置文件
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# 日志
+*.log

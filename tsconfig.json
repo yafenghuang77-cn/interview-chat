@@ -6,17 +6,22 @@
     "preserveConstEnums": true,
     "moduleResolution": "node",
     "experimentalDecorators": true,
-    "noImplicitAny": false,
     "allowSyntheticDefaultImports": true,
     "outDir": "lib",
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
-    "strictNullChecks": true,
     "sourceMap": true,
     "rootDir": ".",
     "jsx": "react-jsx",
     "allowJs": true,
     "resolveJsonModule": true,
+
+    // 严格模式（蚂蚁金服规范：开启完整类型检查）
+    "strict": true,               // 启用所有严格检查（含 noImplicitAny、strictNullChecks 等）
+    "noImplicitReturns": true,    // 函数所有分支必须有返回值
+    "noFallthroughCasesInSwitch": true, // switch-case 必须 break/return
+    "noUnusedLocals": true,       // 禁止未使用的局部变量
+    "noUnusedParameters": true,   // 禁止未使用的函数参数
+    "forceConsistentCasingInFileNames": true, // 文件引用大小写必须一致
+
     "typeRoots": [
       "node_modules/@types"
     ],

@@ -1,0 +1,14 @@
+# 构建产物
+dist/
+lib/
+
+# 依赖
+node_modules/
+
+# 配置文件
+*.config.js
+*.config.ts
+babel.config.js
+
+# Git
+.git/
