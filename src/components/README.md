@@ -17,6 +17,8 @@
 - `NumberBlank`：数值
 - `DateBlank`：日期
 - `MultiBlank`：多项填空
+- `ImageDisplay`：图片展示，支持点击预览
+- `VideoDisplay`：视频展示，支持多个视频预览，未传 `poster` 时默认展示视频首帧
 
 主题色使用微信绿：`#07c160`。
 
@@ -76,6 +78,16 @@ src/components/
     type.ts
     util.ts
     style.less
+  ImageDisplay/
+    index.tsx
+    type.ts
+    util.ts
+    style.less
+  VideoDisplay/
+    index.tsx
+    type.ts
+    util.ts
+    style.less
   index.ts
 ```
 
@@ -101,6 +113,8 @@ const config = {
 | `QUESTION_COMPONENT_TYPE.NUMBER_BLANK` | `NumberBlank` | 数值 |
 | `QUESTION_COMPONENT_TYPE.DATE_BLANK` | `DateBlank` | 日期 |
 | `QUESTION_COMPONENT_TYPE.MULTI_BLANK` | `MultiBlank` | 多项填空 |
+| `QUESTION_COMPONENT_TYPE.IMAGE_DISPLAY` | `ImageDisplay` | 图片展示 |
+| `QUESTION_COMPONENT_TYPE.VIDEO_DISPLAY` | `VideoDisplay` | 视频展示 |
 
 ## 导入方式
 
@@ -421,6 +435,30 @@ const Demo = () => {
 | `onChange` | `(value, payload) => void` | 日期变化回调 |
 
 `datetime` 模式选择时展示 `年/月/日/时/分/秒` 六列，回显格式为 `YYYY年MM月DD日 HH时mm分ss秒`；`onChange` 返回值仍为 `YYYY-MM-DD HH:mm:ss`。
+
+## 展示组件
+
+`ImageDisplay` 和 `VideoDisplay` 都会先在答题区展示媒体入口。点击后优先调用原生预览能力：图片使用 `Taro.previewImage`，视频优先使用 `Taro.previewMedia`；当当前端不支持 `previewMedia` 时，视频会降级到 `Swiper + Video` 预览层，仍然支持手滑切换、居中播放和关闭退出。
+
+```tsx
+import { ImageDisplay, VideoDisplay } from '@/components';
+
+<ImageDisplay
+  images={[
+    { src: 'https://example.com/a.png', title: '图片 A' },
+    { src: 'https://example.com/b.png', title: '图片 B' },
+  ]}
+/>
+
+<VideoDisplay
+  videos={[
+    { src: 'https://example.com/a.mp4', title: '视频 A' },
+    { src: 'https://example.com/b.mp4', title: '视频 B' },
+  ]}
+/>
+```
+
+`VideoDisplay` 的 `poster` 可选；不传时组件会在 H5 尝试抽取视频首帧作为封面，并让移动端视频节点预加载首帧。受浏览器、小程序合法域名和视频跨域策略影响，如果业务上要求封面 100% 稳定展示，建议直接传入 `poster`。
 
 ### MultiBlank
 

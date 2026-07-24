@@ -3,6 +3,7 @@ import { Text, View } from '@tarojs/components';
 import {
   DateBlank,
   EmailBlank,
+  ImageDisplay,
   ImageMultiChoice,
   ImageSingleChoice,
   MultiBlank,
@@ -11,6 +12,7 @@ import {
   PhoneBlank,
   SingleChoice,
   TextBlank,
+  VideoDisplay,
 } from '@/components';
 import { QUESTION_COMPONENT_TYPE, type QuestionComponentType } from '@/common/constants';
 import './AnswerAreaList.less';
@@ -30,6 +32,7 @@ type AnswerConfig = {
   type: QuestionComponentType;
   questionId: string;
   questionText: string;
+  description?: string;
   options?: ChoiceOptionConfig[];
   placeholder?: string;
   defaultValue?: string | number | Array<string | number> | null;
@@ -53,6 +56,22 @@ type AnswerConfig = {
   start?: string;
   end?: string;
   fields?: 'year' | 'month' | 'day';
+  images?: Array<{
+    src: string;
+    title?: string;
+    description?: string;
+    mode?: 'scaleToFill' | 'aspectFit' | 'aspectFill' | 'widthFix';
+    alt?: string;
+  }>;
+  preview?: boolean;
+  src?: string;
+  poster?: string;
+  videos?: Array<{
+    src: string;
+    title?: string;
+    description?: string;
+    poster?: string;
+  }>;
 };
 
 interface AnswerAreaListProps {
@@ -207,6 +226,24 @@ const AnswerAreaList: React.FC<AnswerAreaListProps> = props => {
             maxlength={options.maxlength}
           />
         );
+
+      case QUESTION_COMPONENT_TYPE.IMAGE_DISPLAY:
+        return (
+          <ImageDisplay
+            images={options.images || []}
+            preview={options.preview}
+          />
+        );
+
+      case QUESTION_COMPONENT_TYPE.VIDEO_DISPLAY:
+        return options.src || (options.videos && options.videos.length > 0) ? (
+          <VideoDisplay
+            videos={options.videos}
+            src={options.src}
+            poster={options.poster}
+            description={options.description}
+          />
+        ) : null;
     }
     return null;
   };

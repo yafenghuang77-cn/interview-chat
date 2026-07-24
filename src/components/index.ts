@@ -10,6 +10,8 @@ export { default as EmailBlank } from './EmailBlank';
 export { default as NumberBlank } from './NumberBlank';
 export { default as DateBlank } from './DateBlank';
 export { default as MultiBlank } from './MultiBlank';
+export { default as ImageDisplay } from './ImageDisplay';
+export { default as VideoDisplay } from './VideoDisplay';
 export type {
   SingleChoiceChangePayload,
   SingleChoiceOption,
@@ -64,3 +66,13 @@ export type {
   MultiBlankProps,
   MultiBlankType,
 } from './MultiBlank';
+export type {
+  ImageDisplayImage,
+  ImageDisplayProps,
+  ImageDisplayType,
+} from './ImageDisplay';
+export type {
+  VideoDisplayProps,
+  VideoDisplayType,
+  VideoDisplayVideo,
+} from './VideoDisplay';

@@ -214,6 +214,54 @@ const data = [
       ],
     },
   },
+  {
+    id: 13,
+    role: '主持人',
+    content: '图片展示',
+    duration: createDuration(1),
+    config: {
+      type: QUESTION_COMPONENT_TYPE.IMAGE_DISPLAY,
+      questionId: 'q11',
+      questionText: '下面是本次讨论会用到的参考图片。',
+      images: [
+        {
+          src: 'https://picsum.photos/seed/interview-chat-reference-a/800/800',
+          title: '参考图片',
+          description: '点击图片可预览大图。',
+        },
+        {
+          src: 'https://picsum.photos/seed/interview-chat-reference-b/800/800',
+          title: '参考图片 2',
+          description: '预览层支持切换和退出。',
+        },
+      ],
+      preview: true,
+    },
+  },
+  {
+    id: 14,
+    role: '主持人',
+    content: '视频展示',
+    duration: createDuration(1),
+    config: {
+      type: QUESTION_COMPONENT_TYPE.VIDEO_DISPLAY,
+      questionId: 'q12',
+      questionText: '请先观看这些参考视频。',
+      description: '未配置 poster 时，视频默认显示首帧作为封面。',
+      videos: [
+        {
+          src: 'https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4',
+          title: '参考视频 1',
+          description: '点击封面进入预览。',
+        },
+        {
+          src: 'https://www.w3schools.com/html/mov_bbb.mp4',
+          title: '参考视频 2',
+          description: '预览层支持切换和退出。',
+          },
+        ],
+    },
+  },
 ];
 
 export default data;

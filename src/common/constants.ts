@@ -25,6 +25,10 @@ export const QUESTION_COMPONENT_TYPE = {
   DATE_BLANK: 'DateBlank',
   /** 多项填空题 */
   MULTI_BLANK: 'MultiBlank',
+  /** 图片展示 */
+  IMAGE_DISPLAY: 'ImageDisplay',
+  /** 视频展示 */
+  VIDEO_DISPLAY: 'VideoDisplay',
 } as const;
 
 /** 所有题目组件类型的联合类型。 */

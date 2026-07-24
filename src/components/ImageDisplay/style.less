@@ -1,0 +1,82 @@
+@wechat-primary: #07c160;
+@display-border: #e6e6e6;
+@display-text: #222222;
+@display-text-weak: #8a8a8a;
+@display-bg: #ffffff;
+
+.image-display {
+  width: 100%;
+  box-sizing: border-box;
+
+  &__title {
+    display: block;
+    margin-bottom: 12px;
+    color: @display-text;
+    font-size: 28px;
+    line-height: 40px;
+    overflow-wrap: anywhere;
+  }
+
+  &__description {
+    display: block;
+    margin-bottom: 16px;
+    color: @display-text-weak;
+    font-size: 24px;
+    line-height: 34px;
+    overflow-wrap: anywhere;
+  }
+
+  &__list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  &__item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    padding: 16px;
+    box-sizing: border-box;
+    background: @display-bg;
+    border: 2px solid @display-border;
+    border-radius: 16px;
+  }
+
+  &__image {
+    display: block;
+    width: 260px;
+    height: 260px;
+    background: #f2f3f5;
+    border-radius: 12px;
+  }
+
+  &__image--preview {
+    border: 2px solid transparent;
+  }
+
+  &__image--preview:active {
+    border-color: @wechat-primary;
+  }
+
+  &__item-title {
+    display: block;
+    margin-top: 12px;
+    color: @display-text;
+    font-size: 26px;
+    line-height: 36px;
+    overflow-wrap: anywhere;
+  }
+
+  &__item-description {
+    display: block;
+    margin-top: 6px;
+    color: @display-text-weak;
+    font-size: 22px;
+    line-height: 32px;
+    overflow-wrap: anywhere;
+  }
+}
