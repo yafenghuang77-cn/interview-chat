@@ -1,0 +1,65 @@
+@wechat-primary: #07c160;
+@blank-border: #dcdfe6;
+@blank-text: #222222;
+@blank-text-weak: #8a8a8a;
+@blank-bg: #ffffff;
+@blank-bg-disabled: #f6f7f8;
+@blank-error: #ff4d4f;
+
+.number-blank {
+  width: 100%;
+  box-sizing: border-box;
+
+  &__label {
+    display: block;
+    margin-bottom: 12px;
+    color: @blank-text;
+    font-size: 26px;
+    line-height: 36px;
+  }
+
+  &__field {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    height: 88px;
+    padding: 0 24px;
+    box-sizing: border-box;
+    background: @blank-bg;
+    border: 2px solid @blank-border;
+    border-radius: 14px;
+  }
+
+  &__field--focused {
+    border-color: @wechat-primary;
+  }
+
+  &__field--error {
+    border-color: @blank-error;
+  }
+
+  &__field--disabled {
+    background: @blank-bg-disabled;
+  }
+
+  &__input {
+    width: 100%;
+    height: 40px;
+    box-sizing: border-box;
+    color: @blank-text;
+    font-size: 28px;
+    line-height: 40px;
+  }
+
+  &__field--disabled &__input {
+    color: @blank-text-weak;
+  }
+
+  &__error {
+    display: block;
+    margin-top: 8px;
+    color: @blank-error;
+    font-size: 22px;
+    line-height: 32px;
+  }
+}

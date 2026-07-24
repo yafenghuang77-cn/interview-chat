@@ -1,0 +1,50 @@
+@wechat-primary: #07c160;
+@blank-border: #dcdfe6;
+@blank-text: #222222;
+@blank-text-weak: #8a8a8a;
+@blank-bg: #ffffff;
+@blank-bg-disabled: #f6f7f8;
+
+.text-blank {
+  width: 100%;
+  box-sizing: border-box;
+
+  &__label {
+    display: block;
+    margin-bottom: 12px;
+    color: @blank-text;
+    font-size: 26px;
+    line-height: 36px;
+  }
+
+  &__field {
+    width: 100%;
+    min-height: 88px;
+    padding: 24px;
+    box-sizing: border-box;
+    background: @blank-bg;
+    border: 2px solid @blank-border;
+    border-radius: 14px;
+  }
+
+  &__field--focused {
+    border-color: @wechat-primary;
+  }
+
+  &__field--disabled {
+    background: @blank-bg-disabled;
+  }
+
+  &__input {
+    width: 100%;
+    min-height: 40px;
+    box-sizing: border-box;
+    color: @blank-text;
+    font-size: 28px;
+    line-height: 40px;
+  }
+
+  &__field--disabled &__input {
+    color: @blank-text-weak;
+  }
+}

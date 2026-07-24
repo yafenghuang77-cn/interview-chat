@@ -1,51 +1,210 @@
 import React from 'react';
 import { Text, View } from '@tarojs/components';
-import { SingleChoice, MultiChoice, ImageSingleChoice, ImageMultiChoice } from '@/components';
+import {
+  DateBlank,
+  EmailBlank,
+  ImageMultiChoice,
+  ImageSingleChoice,
+  MultiBlank,
+  MultiChoice,
+  NumberBlank,
+  PhoneBlank,
+  SingleChoice,
+  TextBlank,
+} from '@/components';
+import { QUESTION_COMPONENT_TYPE, type QuestionComponentType } from '@/common/constants';
 import './AnswerAreaList.less';
 
-const AnswerAreaList: React.FC = props => {
+type ChoiceOptionConfig = {
+  id?: string | number;
+  value?: string | number;
+  label: string;
+  description?: string;
+  disabled?: boolean;
+  image?: string;
+  imageMode?: 'scaleToFill' | 'aspectFit' | 'aspectFill' | 'widthFix';
+  imageAlt?: string;
+};
+
+type AnswerConfig = {
+  type: QuestionComponentType;
+  questionId: string;
+  questionText: string;
+  options?: ChoiceOptionConfig[];
+  placeholder?: string;
+  defaultValue?: string | number | Array<string | number> | null;
+  disabled?: boolean;
+  required?: boolean;
+  maxlength?: number;
+  min?: number;
+  max?: number;
+  requiredMessage?: string;
+  errorMessage?: string;
+  minMessage?: string;
+  maxMessage?: string;
+  rows?: number;
+  autoHeight?: boolean;
+  mode?: 'date' | 'datetime';
+  items?: Array<{
+    label: string;
+    placeholder?: string;
+    disabled?: boolean;
+  }>;
+  start?: string;
+  end?: string;
+  fields?: 'year' | 'month' | 'day';
+};
+
+interface AnswerAreaListProps {
+  options: AnswerConfig;
+}
+
+const AnswerAreaList: React.FC<AnswerAreaListProps> = props => {
   const { options } = props;
-  console.log(options, 'options');
+
+  const normalizeChoiceOptions = () =>
+    (options.options || []).map((item, index) => ({
+      ...item,
+      value: item.value ?? item.id ?? index,
+    }));
+
+  const getDefaultTextValue = (): string =>
+    typeof options.defaultValue === 'string' ? options.defaultValue : '';
+
+  const getDefaultChoiceValue = (): string | number | null =>
+    typeof options.defaultValue === 'string' ||
+    typeof options.defaultValue === 'number'
+      ? options.defaultValue
+      : null;
+
+  const getDefaultChoiceValues = (): Array<string | number> =>
+    Array.isArray(options.defaultValue) ? options.defaultValue : [];
+
+  const getDefaultMultiBlankValue = (): string[] | undefined =>
+    Array.isArray(options.defaultValue)
+      ? options.defaultValue.map(item => String(item))
+      : undefined;
 
   const renderItem = (type: string) => {
     switch (type) {
-      case 'SingleChoice':
+      case QUESTION_COMPONENT_TYPE.SINGLE_CHOICE:
         return (
           <SingleChoice
-            options={options.options}
-            onChange={value => {
-              console.log(value, '单选题');
-            }}
+            options={normalizeChoiceOptions()}
+            defaultValue={getDefaultChoiceValue()}
+            disabled={options.disabled}
           />
         );
 
-      case 'MultiChoice':
+      case QUESTION_COMPONENT_TYPE.MULTI_CHOICE:
         return (
           <MultiChoice
-            options={options.options}
-            onChange={value => {
-              console.log(value, '多选题');
-            }}
+            options={normalizeChoiceOptions()}
+            defaultValue={getDefaultChoiceValues()}
+            disabled={options.disabled}
           />
         );
 
-      case 'single':
+      case QUESTION_COMPONENT_TYPE.IMAGE_SINGLE_CHOICE:
         return (
           <ImageSingleChoice
-            options={options.options}
-            onChange={value => {
-              console.log(value, '图片单选题');
-            }}
+            options={normalizeChoiceOptions().map(item => ({
+              ...item,
+              image: item.image || '',
+            }))}
+            defaultValue={getDefaultChoiceValue()}
+            disabled={options.disabled}
           />
         );
 
-      case 'multiple':
+      case QUESTION_COMPONENT_TYPE.IMAGE_MULTI_CHOICE:
         return (
           <ImageMultiChoice
-            options={options.options}
-            onChange={value => {
-              console.log(value, '图片多选题');
-            }}
+            options={normalizeChoiceOptions().map(item => ({
+              ...item,
+              image: item.image || '',
+            }))}
+            defaultValue={getDefaultChoiceValues()}
+            disabled={options.disabled}
+          />
+        );
+
+      case QUESTION_COMPONENT_TYPE.TEXT_BLANK:
+        return (
+          <TextBlank
+            placeholder={options.placeholder}
+            defaultValue={getDefaultTextValue()}
+            disabled={options.disabled}
+            maxlength={options.maxlength}
+            rows={options.rows}
+            autoHeight={options.autoHeight}
+          />
+        );
+
+      case QUESTION_COMPONENT_TYPE.PHONE_BLANK:
+        return (
+          <PhoneBlank
+            placeholder={options.placeholder}
+            defaultValue={getDefaultTextValue()}
+            disabled={options.disabled}
+            required={options.required}
+            maxlength={options.maxlength}
+            requiredMessage={options.requiredMessage}
+            errorMessage={options.errorMessage}
+          />
+        );
+
+      case QUESTION_COMPONENT_TYPE.EMAIL_BLANK:
+        return (
+          <EmailBlank
+            placeholder={options.placeholder}
+            defaultValue={getDefaultTextValue()}
+            disabled={options.disabled}
+            required={options.required}
+            maxlength={options.maxlength}
+            requiredMessage={options.requiredMessage}
+            errorMessage={options.errorMessage}
+          />
+        );
+
+      case QUESTION_COMPONENT_TYPE.NUMBER_BLANK:
+        return (
+          <NumberBlank
+            placeholder={options.placeholder}
+            defaultValue={getDefaultTextValue()}
+            disabled={options.disabled}
+            required={options.required}
+            maxlength={options.maxlength}
+            min={options.min}
+            max={options.max}
+            requiredMessage={options.requiredMessage}
+            errorMessage={options.errorMessage}
+            minMessage={options.minMessage}
+            maxMessage={options.maxMessage}
+          />
+        );
+
+      case QUESTION_COMPONENT_TYPE.DATE_BLANK:
+        return (
+          <DateBlank
+            placeholder={options.placeholder}
+            defaultValue={getDefaultChoiceValue()?.toString() || null}
+            mode={options.mode}
+            disabled={options.disabled}
+            start={options.start}
+            end={options.end}
+            fields={options.fields}
+          />
+        );
+
+      case QUESTION_COMPONENT_TYPE.MULTI_BLANK:
+        return (
+          <MultiBlank
+            items={options.items || []}
+            placeholder={options.placeholder}
+            defaultValue={getDefaultMultiBlankValue()}
+            disabled={options.disabled}
+            maxlength={options.maxlength}
           />
         );
     }

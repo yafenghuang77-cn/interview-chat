@@ -4,6 +4,12 @@ export { default as MultipleChoice } from './MultiChoice';
 export { default as ImageSingleChoice } from './ImageSingleChoice';
 export { default as ImageMultiChoice } from './ImageMultiChoice';
 export { default as ImageMultipleChoice } from './ImageMultiChoice';
+export { default as TextBlank } from './TextBlank';
+export { default as PhoneBlank } from './PhoneBlank';
+export { default as EmailBlank } from './EmailBlank';
+export { default as NumberBlank } from './NumberBlank';
+export { default as DateBlank } from './DateBlank';
+export { default as MultiBlank } from './MultiBlank';
 export type {
   SingleChoiceChangePayload,
   SingleChoiceOption,
@@ -28,3 +34,33 @@ export type {
   ImageMultiChoiceProps,
   ImageMultiChoiceValue,
 } from './ImageMultiChoice';
+export type {
+  TextBlankChangePayload,
+  TextBlankProps,
+  TextBlankType,
+} from './TextBlank';
+export type {
+  PhoneBlankChangePayload,
+  PhoneBlankProps,
+  PhoneBlankType,
+} from './PhoneBlank';
+export type {
+  EmailBlankChangePayload,
+  EmailBlankProps,
+  EmailBlankType,
+} from './EmailBlank';
+export type {
+  NumberBlankChangePayload,
+  NumberBlankProps,
+  NumberBlankType,
+} from './NumberBlank';
+export type {
+  DateBlankChangePayload,
+  DateBlankProps,
+  DateBlankType,
+} from './DateBlank';
+export type {
+  MultiBlankChangePayload,
+  MultiBlankProps,
+  MultiBlankType,
+} from './MultiBlank';
