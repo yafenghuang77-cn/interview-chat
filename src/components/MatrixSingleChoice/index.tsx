@@ -1,4 +1,4 @@
-import React, { useState, forwardRef, useImperativeHandle } from 'react';
+import React, { useState } from 'react';
 import { ScrollView, View } from '@tarojs/components';
 import type {
   MatrixSingleChoiceColumn,
@@ -10,6 +10,9 @@ import type {
 import { getRecordKey, getSingleAnswerValue, joinClassNames } from './util';
 import './style.less';
 
+/**
+ * 矩阵单选组件。每一行只能选择一个列选项，超出宽度时支持横向滑动。
+ */
 const MatrixSingleChoiceInner = <
   R extends MatrixSingleChoiceValue = MatrixSingleChoiceValue,
   C extends MatrixSingleChoiceValue = MatrixSingleChoiceValue,
@@ -30,7 +33,7 @@ const MatrixSingleChoiceInner = <
   const [innerValue, setInnerValue] = useState(defaultValue);
   const currentValue = value !== undefined ? value : innerValue;
 
-  useImperativeHandle(
+  React.useImperativeHandle(
     ref,
     () => ({
       init: nextValue => setInnerValue(nextValue || {}),
@@ -125,7 +128,7 @@ const MatrixSingleChoiceInner = <
   );
 };
 
-const MatrixSingleChoice = forwardRef(MatrixSingleChoiceInner) as <
+const MatrixSingleChoice = React.forwardRef(MatrixSingleChoiceInner) as <
   R extends MatrixSingleChoiceValue = MatrixSingleChoiceValue,
   C extends MatrixSingleChoiceValue = MatrixSingleChoiceValue,
 >(

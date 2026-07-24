@@ -1,4 +1,4 @@
-import React, { useState, forwardRef, useImperativeHandle } from 'react';
+import React, { useState } from 'react';
 import { ScrollView, View } from '@tarojs/components';
 import StarIcon from '../StarIcon';
 import type {
@@ -17,6 +17,9 @@ import {
 } from './util';
 import './style.less';
 
+/**
+ * 矩阵双向打分组件。每个矩阵行按上下两组展示左右方向的五角星打分。
+ */
 const MatrixBidirectionalRatingInner = <
   R extends MatrixBidirectionalRatingValue = MatrixBidirectionalRatingValue,
 >(
@@ -39,7 +42,7 @@ const MatrixBidirectionalRatingInner = <
   const currentValue = value !== undefined ? value : innerValue;
   const ratingColumns = columns;
 
-  useImperativeHandle(
+  React.useImperativeHandle(
     ref,
     () => ({
       init: nextValue => setInnerValue(nextValue || {}),
@@ -169,7 +172,7 @@ const MatrixBidirectionalRatingInner = <
   );
 };
 
-const MatrixBidirectionalRating = forwardRef(MatrixBidirectionalRatingInner) as <
+const MatrixBidirectionalRating = React.forwardRef(MatrixBidirectionalRatingInner) as <
   R extends MatrixBidirectionalRatingValue = MatrixBidirectionalRatingValue,
 >(
   props: MatrixBidirectionalRatingProps<R> & React.RefAttributes<MatrixBidirectionalRatingRef<R>>,

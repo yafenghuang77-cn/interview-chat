@@ -1,4 +1,4 @@
-import React, { useState, forwardRef, useImperativeHandle } from 'react';
+import React, { useState } from 'react';
 import { ScrollView, View } from '@tarojs/components';
 import StarIcon from '../StarIcon';
 import type {
@@ -10,6 +10,9 @@ import type {
 import { getRatingValue, getRecordKey, joinClassNames } from './util';
 import './style.less';
 
+/**
+ * 矩阵打分组件。布局与矩阵单选一致，将单元格控件替换为五角星打分。
+ */
 const MatrixRatingInner = <R extends MatrixRatingValue = MatrixRatingValue>(
   props: MatrixRatingProps<R>,
   ref: React.ForwardedRef<MatrixRatingRef<R>>,
@@ -28,7 +31,7 @@ const MatrixRatingInner = <R extends MatrixRatingValue = MatrixRatingValue>(
   const currentValue = value !== undefined ? value : innerValue;
   const ratingColumns = columns;
 
-  useImperativeHandle(
+  React.useImperativeHandle(
     ref,
     () => ({
       init: nextValue => setInnerValue(nextValue || {}),
@@ -125,7 +128,7 @@ const MatrixRatingInner = <R extends MatrixRatingValue = MatrixRatingValue>(
   );
 };
 
-const MatrixRating = forwardRef(MatrixRatingInner) as <
+const MatrixRating = React.forwardRef(MatrixRatingInner) as <
   R extends MatrixRatingValue = MatrixRatingValue,
 >(
   props: MatrixRatingProps<R> & React.RefAttributes<MatrixRatingRef<R>>,

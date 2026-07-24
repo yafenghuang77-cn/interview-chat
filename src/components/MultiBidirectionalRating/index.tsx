@@ -1,4 +1,4 @@
-import React, { useState, forwardRef, useImperativeHandle } from 'react';
+import React, { useState } from 'react';
 import { ScrollView, View } from '@tarojs/components';
 import StarIcon from '../StarIcon';
 import type {
@@ -18,6 +18,9 @@ import {
 } from './util';
 import './style.less';
 
+/**
+ * 多项双向打分组件。用于多个题项分别在左右两个方向上打分。
+ */
 const MultiBidirectionalRatingInner = <
   R extends MultiBidirectionalRatingValue = MultiBidirectionalRatingValue,
 >(
@@ -39,7 +42,7 @@ const MultiBidirectionalRatingInner = <
   const [innerValue, setInnerValue] = useState(defaultValue);
   const currentValue = value !== undefined ? value : innerValue;
 
-  useImperativeHandle(
+  React.useImperativeHandle(
     ref,
     () => ({
       init: nextValue => setInnerValue(nextValue || {}),
@@ -160,7 +163,7 @@ const MultiBidirectionalRatingInner = <
   );
 };
 
-const MultiBidirectionalRating = forwardRef(MultiBidirectionalRatingInner) as <
+const MultiBidirectionalRating = React.forwardRef(MultiBidirectionalRatingInner) as <
   R extends MultiBidirectionalRatingValue = MultiBidirectionalRatingValue,
 >(
   props: MultiBidirectionalRatingProps<R> & React.RefAttributes<MultiBidirectionalRatingRef<R>>,

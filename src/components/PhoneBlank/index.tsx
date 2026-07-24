@@ -1,10 +1,13 @@
-import React, { useState, forwardRef, useImperativeHandle } from 'react';
+import React, { useState } from 'react';
 import { Input, Text, View } from '@tarojs/components';
 import type { PhoneBlankProps, PhoneBlankRef } from './type';
 import { getInputValue, joinClassNames, normalizePhoneValue, validatePhoneValue } from './util';
 import './style.less';
 
-const PhoneBlank = forwardRef<PhoneBlankRef, PhoneBlankProps>((props, ref) => {
+/**
+ * 手机号填空组件。内置中国大陆 11 位手机号校验，格式不正确时展示错误提示。
+ */
+const PhoneBlank = React.forwardRef<PhoneBlankRef, PhoneBlankProps>((props, ref) => {
   const {
     questionId,
     value,
@@ -36,7 +39,7 @@ const PhoneBlank = forwardRef<PhoneBlankRef, PhoneBlankProps>((props, ref) => {
     });
   };
 
-  useImperativeHandle(
+  React.useImperativeHandle(
     ref,
     () => ({
       init: nextValue => {

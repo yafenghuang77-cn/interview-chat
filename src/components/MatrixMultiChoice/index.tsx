@@ -1,4 +1,4 @@
-import React, { useState, forwardRef, useImperativeHandle } from 'react';
+import React, { useState } from 'react';
 import { ScrollView, Text, View } from '@tarojs/components';
 import type {
   MatrixMultiChoiceColumn,
@@ -10,6 +10,9 @@ import type {
 import { getMultiAnswerValue, getRecordKey, joinClassNames, toggleMatrixValue } from './util';
 import './style.less';
 
+/**
+ * 矩阵多选组件。每一行可以选择多个列选项，超出宽度时支持横向滑动。
+ */
 const MatrixMultiChoiceInner = <
   R extends MatrixMultiChoiceValue = MatrixMultiChoiceValue,
   C extends MatrixMultiChoiceValue = MatrixMultiChoiceValue,
@@ -30,7 +33,7 @@ const MatrixMultiChoiceInner = <
   const [innerValue, setInnerValue] = useState(defaultValue);
   const currentValue = value !== undefined ? value : innerValue;
 
-  useImperativeHandle(
+  React.useImperativeHandle(
     ref,
     () => ({
       init: nextValue => setInnerValue(nextValue || {}),
@@ -121,7 +124,7 @@ const MatrixMultiChoiceInner = <
   );
 };
 
-const MatrixMultiChoice = forwardRef(MatrixMultiChoiceInner) as <
+const MatrixMultiChoice = React.forwardRef(MatrixMultiChoiceInner) as <
   R extends MatrixMultiChoiceValue = MatrixMultiChoiceValue,
   C extends MatrixMultiChoiceValue = MatrixMultiChoiceValue,
 >(

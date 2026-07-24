@@ -1,9 +1,12 @@
-import React, { useState, useImperativeHandle, forwardRef } from 'react';
+import React, { useState } from 'react';
 import { Image, Text, View } from '@tarojs/components';
 import type { ImageMultiChoiceOption, ImageMultiChoiceProps, ImageMultiChoiceRef } from './type';
 import { joinClassNames } from './util';
 import './style.less';
 
+/**
+ * 图片多选组件。每个选项垂直排列，上方展示左对齐正方形图片，下方展示选项内容。
+ */
 const ImageMultiChoiceInner = <T extends string | number = string | number>(
   props: ImageMultiChoiceProps<T>,
   ref: React.ForwardedRef<ImageMultiChoiceRef<T>>,
@@ -21,7 +24,7 @@ const ImageMultiChoiceInner = <T extends string | number = string | number>(
   const [innerValue, setInnerValue] = useState<T[]>(defaultValue);
   const selectedValue = value !== undefined ? value : innerValue;
 
-  useImperativeHandle(
+  React.useImperativeHandle(
     ref,
     () => ({
       init: nextValue => setInnerValue(nextValue || []),
@@ -103,7 +106,7 @@ const ImageMultiChoiceInner = <T extends string | number = string | number>(
   );
 };
 
-const ImageMultiChoice = forwardRef(ImageMultiChoiceInner) as <
+const ImageMultiChoice = React.forwardRef(ImageMultiChoiceInner) as <
   T extends string | number = string | number,
 >(
   props: ImageMultiChoiceProps<T> & React.RefAttributes<ImageMultiChoiceRef<T>>,

@@ -1,4 +1,4 @@
-import React, { useState, useImperativeHandle, forwardRef } from 'react';
+import React, { useState } from 'react';
 import { ScrollView, View } from '@tarojs/components';
 import StarIcon from '../StarIcon';
 import type {
@@ -10,7 +10,10 @@ import type {
 import { getActiveScore, getColumnKey, getNextValue, joinClassNames } from './util';
 import './style.less';
 
-const BidirectionalRating = forwardRef<BidirectionalRatingRef, BidirectionalRatingProps>(
+/**
+ * 双向打分组件。用于左右两个方向分别选择打分强度，两个方向可同时保留选择值。
+ */
+const BidirectionalRating = React.forwardRef<BidirectionalRatingRef, BidirectionalRatingProps>(
   (props, ref) => {
     const {
       questionId,
@@ -26,7 +29,7 @@ const BidirectionalRating = forwardRef<BidirectionalRatingRef, BidirectionalRati
     const [innerValue, setInnerValue] = useState(defaultValue);
     const currentValue = value !== undefined ? value : innerValue;
 
-    useImperativeHandle(
+    React.useImperativeHandle(
       ref,
       () => ({
         init: nextValue => setInnerValue(nextValue || null),

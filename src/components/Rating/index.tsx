@@ -1,11 +1,14 @@
-import React, { useState, forwardRef, useImperativeHandle } from 'react';
+import React, { useState } from 'react';
 import { ScrollView, View } from '@tarojs/components';
 import StarIcon from '../StarIcon';
 import type { RatingOption, RatingProps, RatingRef } from './type';
 import { getOptionKey, getRatingValue, joinClassNames } from './util';
 import './style.less';
 
-const Rating = forwardRef<RatingRef, RatingProps>((props, ref) => {
+/**
+ * 打分题组件。使用五角星展示分值，选中后按分值点亮对应数量的星星。
+ */
+const Rating = React.forwardRef<RatingRef, RatingProps>((props, ref) => {
   const {
     questionId,
     options,
@@ -19,7 +22,7 @@ const Rating = forwardRef<RatingRef, RatingProps>((props, ref) => {
   const currentValue = value !== undefined ? value : innerValue;
   const selectedScore = getRatingValue(currentValue);
 
-  useImperativeHandle(
+  React.useImperativeHandle(
     ref,
     () => ({
       init: nextValue => setInnerValue(nextValue ?? null),

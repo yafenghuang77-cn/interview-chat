@@ -5,27 +5,20 @@ import type {
   MatrixBidirectionalRatingValue,
 } from './type';
 
-export const joinClassNames = (
-  classNames: Array<string | false | null | undefined>,
-): string => classNames.filter(Boolean).join(' ');
+export const joinClassNames = (classNames: Array<string | false | null | undefined>): string =>
+  classNames.filter(Boolean).join(' ');
 
-export const getRecordKey = (
-  value: MatrixBidirectionalRatingValue,
-): string => String(value);
+export const getRecordKey = (value: MatrixBidirectionalRatingValue): string => String(value);
 
-export const getBidirectionalRatingValue = <
-  R extends MatrixBidirectionalRatingValue,
->(
+export const getBidirectionalRatingValue = <R extends MatrixBidirectionalRatingValue>(
   answer: MatrixBidirectionalRatingAnswer<R>,
   rowValue: R,
-): MatrixBidirectionalRatingScore | undefined =>
-  answer[getRecordKey(rowValue) as R];
+): MatrixBidirectionalRatingScore | undefined => answer[getRecordKey(rowValue) as R];
 
 export const getActiveScore = (
   value: MatrixBidirectionalRatingScore | undefined,
   side: MatrixBidirectionalRatingSide,
-): number =>
-  Number(value?.[side === 'left' ? 'leftScore' : 'rightScore'] || 0);
+): number => Number(value?.[side === 'left' ? 'leftScore' : 'rightScore'] || 0);
 
 export const getNextRatingValue = (
   value: MatrixBidirectionalRatingScore | undefined,

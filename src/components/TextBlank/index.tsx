@@ -1,10 +1,13 @@
-import React, { useState, forwardRef, useImperativeHandle } from 'react';
+import React, { useState } from 'react';
 import { Textarea, View } from '@tarojs/components';
 import type { TextBlankProps, TextBlankRef } from './type';
 import { getInputValue, getTextAreaHeight, joinClassNames } from './util';
 import './style.less';
 
-const TextBlank = forwardRef<TextBlankRef, TextBlankProps>((props, ref) => {
+/**
+ * 文本填空组件。用于多行文本输入，支持默认行数、自动增高、编辑回显和提交取值。
+ */
+const TextBlank = React.forwardRef<TextBlankRef, TextBlankProps>((props, ref) => {
   const {
     questionId,
     value,
@@ -24,7 +27,7 @@ const TextBlank = forwardRef<TextBlankRef, TextBlankProps>((props, ref) => {
   const [focused, setFocused] = useState(false);
   const currentValue = value !== undefined ? value : innerValue;
 
-  useImperativeHandle(
+  React.useImperativeHandle(
     ref,
     () => ({
       init: nextValue => setInnerValue(nextValue || ''),

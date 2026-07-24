@@ -1,10 +1,13 @@
-import React, { useImperativeHandle, forwardRef, useEffect } from 'react';
+import React from 'react';
 import { Image, View } from '@tarojs/components';
 import type { ImageDisplayProps, ImageDisplayRef } from './type';
 import { getImageKey, joinClassNames, previewImages } from './util';
 import './style.less';
 
-const ImageDisplay = forwardRef<ImageDisplayRef, ImageDisplayProps>((props, ref) => {
+/**
+ * 图片展示组件。用于图片列表展示和原生图片预览。
+ */
+const ImageDisplay = React.forwardRef<ImageDisplayRef, ImageDisplayProps>((props, ref) => {
   const {
     questionId,
     images,
@@ -16,11 +19,11 @@ const ImageDisplay = forwardRef<ImageDisplayRef, ImageDisplayProps>((props, ref)
   } = props;
   const [innerImages, setInnerImages] = React.useState(images);
 
-  useEffect(() => {
+  React.useEffect(() => {
     setInnerImages(images);
   }, [images]);
 
-  useImperativeHandle(
+  React.useImperativeHandle(
     ref,
     () => ({
       init: nextValue => setInnerImages(nextValue || []),

@@ -1,14 +1,9 @@
-import type {
-  MatrixMultiChoiceAnswer,
-  MatrixMultiChoiceValue,
-} from './type';
+import type { MatrixMultiChoiceAnswer, MatrixMultiChoiceValue } from './type';
 
-export const joinClassNames = (
-  classNames: Array<string | false | null | undefined>,
-): string => classNames.filter(Boolean).join(' ');
+export const joinClassNames = (classNames: Array<string | false | null | undefined>): string =>
+  classNames.filter(Boolean).join(' ');
 
-export const getRecordKey = (value: MatrixMultiChoiceValue): string =>
-  String(value);
+export const getRecordKey = (value: MatrixMultiChoiceValue): string => String(value);
 
 export const getMultiAnswerValue = <
   R extends MatrixMultiChoiceValue,

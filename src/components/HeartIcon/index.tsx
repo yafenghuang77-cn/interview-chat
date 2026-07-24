@@ -4,6 +4,9 @@ import type { HeartIconProps } from './type';
 import { joinClassNames } from './util';
 import './style.less';
 
+/**
+ * 公共爱心图标组件。用于 NPS 等推荐度打分展示。
+ */
 const HeartIcon: React.FC<HeartIconProps> = props => {
   const {
     active = false,

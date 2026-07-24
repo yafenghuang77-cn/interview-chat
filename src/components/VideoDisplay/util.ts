@@ -5,12 +5,10 @@ import type { VideoDisplayVideo } from './type';
 export const FIRST_FRAME_TIME = 0.1;
 const FIRST_FRAME_TIMEOUT = 5000;
 
-export const joinClassNames = (
-  classNames: Array<string | false | null | undefined>,
-): string => classNames.filter(Boolean).join(' ');
+export const joinClassNames = (classNames: Array<string | false | null | undefined>): string =>
+  classNames.filter(Boolean).join(' ');
 
-export const getVideoPoster = (poster?: string): string | undefined =>
-  poster || undefined;
+export const getVideoPoster = (poster?: string): string | undefined => poster || undefined;
 
 export const normalizeVideos = (
   videos: VideoDisplayVideo[] | undefined,
@@ -62,14 +60,8 @@ export const previewVideos = (
   currentIndex: number,
   posterMap: Record<string, string> = {},
 ): Promise<boolean> => {
-  const { sources, current } = getVideoPreviewOptions(
-    videos,
-    currentIndex,
-    posterMap,
-  );
-  const previewMedia = Taro.previewMedia as
-    | typeof Taro.previewMedia
-    | undefined;
+  const { sources, current } = getVideoPreviewOptions(videos, currentIndex, posterMap);
+  const previewMedia = Taro.previewMedia as typeof Taro.previewMedia | undefined;
 
   if (sources.length === 0 || !previewMedia) {
     return Promise.resolve(false);
@@ -134,9 +126,7 @@ export const createFirstFramePoster = (src: string): Promise<string | null> => {
     };
 
     function handleLoadedMetadata() {
-      const duration = Number.isFinite(video.duration)
-        ? video.duration
-        : FIRST_FRAME_TIME;
+      const duration = Number.isFinite(video.duration) ? video.duration : FIRST_FRAME_TIME;
       const targetTime = Math.min(FIRST_FRAME_TIME, Math.max(0, duration));
 
       try {

@@ -1,10 +1,13 @@
-import React, { useState, useImperativeHandle, forwardRef } from 'react';
+import React, { useState } from 'react';
 import { Input, Text, View } from '@tarojs/components';
 import type { EmailBlankProps, EmailBlankRef } from './type';
 import { getInputValue, joinClassNames, validateEmailValue } from './util';
 import './style.less';
 
-const EmailBlank = forwardRef<EmailBlankRef, EmailBlankProps>((props, ref) => {
+/**
+ * 邮箱填空组件。内置邮箱格式校验，格式不正确时展示错误提示。
+ */
+const EmailBlank = React.forwardRef<EmailBlankRef, EmailBlankProps>((props, ref) => {
   const {
     questionId,
     value,
@@ -36,7 +39,7 @@ const EmailBlank = forwardRef<EmailBlankRef, EmailBlankProps>((props, ref) => {
     });
   };
 
-  useImperativeHandle(
+  React.useImperativeHandle(
     ref,
     () => ({
       init: nextValue => {

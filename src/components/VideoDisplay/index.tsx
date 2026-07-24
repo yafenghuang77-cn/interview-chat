@@ -1,4 +1,4 @@
-import React, { forwardRef, useImperativeHandle } from 'react';
+import React from 'react';
 import { Swiper, SwiperItem, Text, Video, View, Image, type SwiperProps } from '@tarojs/components';
 import type { VideoDisplayProps, VideoDisplayRef, VideoDisplayVideo } from './type';
 import {
@@ -12,7 +12,10 @@ import {
 } from './util';
 import './style.less';
 
-const VideoDisplay = forwardRef<VideoDisplayRef, VideoDisplayProps>((props, ref) => {
+/**
+ * 视频展示组件。用于视频列表展示和预览，未配置封面时尝试使用首帧作为封面。
+ */
+const VideoDisplay = React.forwardRef<VideoDisplayRef, VideoDisplayProps>((props, ref) => {
   const { questionId, videos, src, title, description, poster, className = '' } = props;
   const [innerVideos, setInnerVideos] = React.useState<VideoDisplayVideo[] | null>(null);
   const videoList = innerVideos || normalizeVideos(videos, src, poster, title, description);
@@ -32,7 +35,7 @@ const VideoDisplay = forwardRef<VideoDisplayRef, VideoDisplayProps>((props, ref)
     setPreviewIndex(null);
   };
 
-  useImperativeHandle(
+  React.useImperativeHandle(
     ref,
     () => ({
       init: nextValue => setInnerVideos(nextValue || []),

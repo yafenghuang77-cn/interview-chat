@@ -1,13 +1,9 @@
-export const joinClassNames = (
-  classNames: Array<string | false | null | undefined>,
-): string => classNames.filter(Boolean).join(' ');
+export const joinClassNames = (classNames: Array<string | false | null | undefined>): string =>
+  classNames.filter(Boolean).join(' ');
 
 export const padTimeUnit = (value: number): string => `${value}`.padStart(2, '0');
 
-export const getDateText = (
-  value: string | null | undefined,
-  placeholder: string,
-): string => {
+export const getDateText = (value: string | null | undefined, placeholder: string): string => {
   if (!value) {
     return placeholder;
   }
@@ -17,17 +13,12 @@ export const getDateText = (
   return matches ? `${matches[1]}年${matches[2]}月${matches[3]}日` : value;
 };
 
-export const getDatetimeText = (
-  value: string | null | undefined,
-  placeholder: string,
-): string => {
+export const getDatetimeText = (value: string | null | undefined, placeholder: string): string => {
   if (!value) {
     return placeholder;
   }
 
-  const matches = value.match(
-    /^(\d{4})-(\d{2})-(\d{2})(?:\s+(\d{2}):(\d{2}):(\d{2}))?$/,
-  );
+  const matches = value.match(/^(\d{4})-(\d{2})-(\d{2})(?:\s+(\d{2}):(\d{2}):(\d{2}))?$/);
 
   if (!matches) {
     return value;
@@ -39,8 +30,7 @@ export const getDatetimeText = (
 export const createNumberRange = (start: number, end: number): string[] =>
   Array.from({ length: end - start + 1 }, (_, index) => `${start + index}`);
 
-export const stripTimeUnit = (value: string): string =>
-  value.replace(/[年月日时分秒]/g, '');
+export const stripTimeUnit = (value: string): string => value.replace(/[年月日时分秒]/g, '');
 
 export const getDefaultYearRange = (): number[] => {
   const currentYear = new Date().getFullYear();
@@ -76,9 +66,7 @@ export const getDatetimeIndexes = (
   range: string[][],
 ): number[] => {
   const fallback = new Date();
-  const matches = value?.match(
-    /^(\d{4})-(\d{2})-(\d{2})(?:\s+(\d{2}):(\d{2}):(\d{2}))?$/,
-  );
+  const matches = value?.match(/^(\d{4})-(\d{2})-(\d{2})(?:\s+(\d{2}):(\d{2}):(\d{2}))?$/);
   const parts = matches
     ? [
         matches[1],
@@ -98,16 +86,15 @@ export const getDatetimeIndexes = (
       ];
 
   return parts.map((part, index) =>
-    Math.max(range[index].findIndex(item => stripTimeUnit(item) === part), 0),
+    Math.max(
+      range[index].findIndex(item => stripTimeUnit(item) === part),
+      0,
+    ),
   );
 };
 
-export const formatDatetimeValue = (
-  indexes: number[],
-  range: string[][],
-): string => {
-  const [yearIndex, monthIndex, dayIndex, hourIndex, minuteIndex, secondIndex] =
-    indexes;
+export const formatDatetimeValue = (indexes: number[], range: string[][]): string => {
+  const [yearIndex, monthIndex, dayIndex, hourIndex, minuteIndex, secondIndex] = indexes;
   const year = stripTimeUnit(range[0][yearIndex]);
   const month = stripTimeUnit(range[1][monthIndex]);
   const day = stripTimeUnit(range[2][dayIndex]);

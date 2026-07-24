@@ -1,10 +1,13 @@
-import React, { useState, forwardRef, useImperativeHandle } from 'react';
+import React, { useState } from 'react';
 import { Input, Text, View } from '@tarojs/components';
 import type { NumberBlankProps, NumberBlankRef } from './type';
 import { getInputValue, joinClassNames, validateNumberValue } from './util';
 import './style.less';
 
-const NumberBlank = forwardRef<NumberBlankRef, NumberBlankProps>((props, ref) => {
+/**
+ * 数值填空组件。内置数字格式、最小值和最大值校验。
+ */
+const NumberBlank = React.forwardRef<NumberBlankRef, NumberBlankProps>((props, ref) => {
   const {
     questionId,
     value,
@@ -51,7 +54,7 @@ const NumberBlank = forwardRef<NumberBlankRef, NumberBlankProps>((props, ref) =>
     });
   };
 
-  useImperativeHandle(
+  React.useImperativeHandle(
     ref,
     () => ({
       init: nextValue => {

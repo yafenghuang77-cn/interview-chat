@@ -4,6 +4,9 @@ import type { StarIconProps } from './type';
 import { joinClassNames } from './util';
 import './style.less';
 
+/**
+ * 公共五角星图标组件。用于普通打分和矩阵打分的星级展示。
+ */
 const StarIcon: React.FC<StarIconProps> = props => {
   const {
     active = false,

@@ -1,9 +1,12 @@
-import React, { useState, forwardRef, useImperativeHandle } from 'react';
+import React, { useState } from 'react';
 import { Text, View } from '@tarojs/components';
 import type { MultiChoiceOption, MultiChoiceProps, MultiChoiceRef } from './type';
 import { joinClassNames } from './util';
 import './style.less';
 
+/**
+ * 文字多选组件。用于在一组选项中选择多个答案，支持受控、非受控、编辑回显和提交取值。
+ */
 const MultiChoiceInner = <T extends string | number = string | number>(
   props: MultiChoiceProps<T>,
   ref: React.ForwardedRef<MultiChoiceRef<T>>,
@@ -21,7 +24,7 @@ const MultiChoiceInner = <T extends string | number = string | number>(
   const [innerValue, setInnerValue] = useState<T[]>(defaultValue);
   const selectedValue = value !== undefined ? value : innerValue;
 
-  useImperativeHandle(
+  React.useImperativeHandle(
     ref,
     () => ({
       init: nextValue => setInnerValue(nextValue || []),
@@ -91,7 +94,9 @@ const MultiChoiceInner = <T extends string | number = string | number>(
   );
 };
 
-const MultiChoice = forwardRef(MultiChoiceInner) as <T extends string | number = string | number>(
+const MultiChoice = React.forwardRef(MultiChoiceInner) as <
+  T extends string | number = string | number,
+>(
   props: MultiChoiceProps<T> & React.RefAttributes<MultiChoiceRef<T>>,
 ) => React.ReactElement;
 

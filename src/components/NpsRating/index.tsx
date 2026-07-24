@@ -1,11 +1,14 @@
-import React, { useState, forwardRef, useImperativeHandle } from 'react';
+import React, { useState } from 'react';
 import { ScrollView, View } from '@tarojs/components';
 import HeartIcon from '../HeartIcon';
 import type { NpsRatingOption, NpsRatingProps, NpsRatingRef } from './type';
 import { getOptionKey, isHeartActive, joinClassNames } from './util';
 import './style.less';
 
-const NpsRating = forwardRef<NpsRatingRef, NpsRatingProps>((props, ref) => {
+/**
+ * NPS 推荐度组件。使用爱心展示分值，选中后按分值点亮对应数量的爱心。
+ */
+const NpsRating = React.forwardRef<NpsRatingRef, NpsRatingProps>((props, ref) => {
   const {
     questionId,
     options,
@@ -20,7 +23,7 @@ const NpsRating = forwardRef<NpsRatingRef, NpsRatingProps>((props, ref) => {
   const [innerValue, setInnerValue] = useState(defaultValue);
   const currentValue = value !== undefined ? value : innerValue;
 
-  useImperativeHandle(
+  React.useImperativeHandle(
     ref,
     () => ({
       init: nextValue => setInnerValue(nextValue ?? null),

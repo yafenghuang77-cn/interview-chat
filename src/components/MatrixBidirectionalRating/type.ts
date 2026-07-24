@@ -1,12 +1,14 @@
 import type React from 'react';
 import type { QUESTION_COMPONENT_TYPE } from '../../common/constants';
 
+/** MatrixBidirectionalRating 对应的题目类型常量。 */
 export type MatrixBidirectionalRatingType =
   typeof QUESTION_COMPONENT_TYPE.MATRIX_BIDIRECTIONAL_RATING;
 
 export type MatrixBidirectionalRatingValue = string | number;
 export type MatrixBidirectionalRatingSide = 'left' | 'right';
 
+/** Matrix Bidirectional Rating 组件的行配置。 */
 export interface MatrixBidirectionalRatingRow<
   T extends MatrixBidirectionalRatingValue = MatrixBidirectionalRatingValue,
 > {
@@ -18,6 +20,7 @@ export interface MatrixBidirectionalRatingRow<
   disabled?: boolean;
 }
 
+/** Matrix Bidirectional Rating 组件的列配置。 */
 export interface MatrixBidirectionalRatingColumn {
   label: React.ReactNode;
   value: number;
@@ -25,15 +28,18 @@ export interface MatrixBidirectionalRatingColumn {
   disabled?: boolean;
 }
 
+/** Matrix Bidirectional Rating 组件的双向分值配置。 */
 export interface MatrixBidirectionalRatingScore {
   leftScore?: number;
   rightScore?: number;
 }
 
+/** Matrix Bidirectional Rating 组件内部保存和对外提交的答案值。 */
 export type MatrixBidirectionalRatingAnswer<
   R extends MatrixBidirectionalRatingValue = MatrixBidirectionalRatingValue,
 > = Partial<Record<R, MatrixBidirectionalRatingScore>>;
 
+/** Matrix Bidirectional Rating 组件 onChange 回调的上下文信息。 */
 export interface MatrixBidirectionalRatingChangePayload<
   R extends MatrixBidirectionalRatingValue = MatrixBidirectionalRatingValue,
 > {
@@ -43,6 +49,7 @@ export interface MatrixBidirectionalRatingChangePayload<
   value: MatrixBidirectionalRatingAnswer<R>;
 }
 
+/** Matrix Bidirectional Rating 组件提交给业务层的数据结构。 */
 export interface MatrixBidirectionalRatingSubmitValue<
   R extends MatrixBidirectionalRatingValue = MatrixBidirectionalRatingValue,
 > {
@@ -50,6 +57,7 @@ export interface MatrixBidirectionalRatingSubmitValue<
   value: MatrixBidirectionalRatingAnswer<R>;
 }
 
+/** Matrix Bidirectional Rating 组件暴露给父级的命令式方法，用于编辑回显和提交取值。 */
 export interface MatrixBidirectionalRatingRef<
   R extends MatrixBidirectionalRatingValue = MatrixBidirectionalRatingValue,
 > {
@@ -57,6 +65,7 @@ export interface MatrixBidirectionalRatingRef<
   getSubmitValue: () => MatrixBidirectionalRatingSubmitValue<R>;
 }
 
+/** 矩阵双向打分组件。每个矩阵行按上下两组展示左右方向的五角星打分。 */
 export interface MatrixBidirectionalRatingProps<
   R extends MatrixBidirectionalRatingValue = MatrixBidirectionalRatingValue,
 > {

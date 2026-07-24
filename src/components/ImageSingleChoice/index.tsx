@@ -1,9 +1,12 @@
-import React, { useState, forwardRef, useImperativeHandle } from 'react';
+import React, { useState } from 'react';
 import { Image, View } from '@tarojs/components';
 import type { ImageSingleChoiceOption, ImageSingleChoiceProps, ImageSingleChoiceRef } from './type';
 import { joinClassNames } from './util';
 import './style.less';
 
+/**
+ * 图片单选组件。每个选项垂直排列，上方展示左对齐正方形图片，下方展示选项内容。
+ */
 const ImageSingleChoiceInner = <T extends string | number = string | number>(
   props: ImageSingleChoiceProps<T>,
   ref: React.ForwardedRef<ImageSingleChoiceRef<T>>,
@@ -21,7 +24,7 @@ const ImageSingleChoiceInner = <T extends string | number = string | number>(
   const [innerValue, setInnerValue] = useState<T | null>(defaultValue);
   const selectedValue = value !== undefined ? value : innerValue;
 
-  useImperativeHandle(
+  React.useImperativeHandle(
     ref,
     () => ({
       init: nextValue => setInnerValue(nextValue ?? null),
@@ -98,7 +101,7 @@ const ImageSingleChoiceInner = <T extends string | number = string | number>(
   );
 };
 
-const ImageSingleChoice = forwardRef(ImageSingleChoiceInner) as <
+const ImageSingleChoice = React.forwardRef(ImageSingleChoiceInner) as <
   T extends string | number = string | number,
 >(
   props: ImageSingleChoiceProps<T> & React.RefAttributes<ImageSingleChoiceRef<T>>,

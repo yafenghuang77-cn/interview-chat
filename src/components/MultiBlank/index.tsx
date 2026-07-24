@@ -1,10 +1,13 @@
-import React, { useState, forwardRef, useImperativeHandle } from 'react';
+import React, { useState } from 'react';
 import { Input, View } from '@tarojs/components';
 import type { MultiBlankProps, MultiBlankRef } from './type';
 import { createBlankItems, getInputValue, joinClassNames } from './util';
 import './style.less';
 
-const MultiBlank = forwardRef<MultiBlankRef, MultiBlankProps>((props, ref) => {
+/**
+ * 多项填空组件。用于固定文案对应固定输入框的场景，不提供新增/删除项能力。
+ */
+const MultiBlank = React.forwardRef<MultiBlankRef, MultiBlankProps>((props, ref) => {
   const {
     questionId,
     items,
@@ -23,7 +26,7 @@ const MultiBlank = forwardRef<MultiBlankRef, MultiBlankProps>((props, ref) => {
   const [innerValue, setInnerValue] = useState(() => createBlankItems(defaultValue, items.length));
   const currentValue = value !== undefined ? createBlankItems(value, items.length) : innerValue;
 
-  useImperativeHandle(
+  React.useImperativeHandle(
     ref,
     () => ({
       init: nextValue => setInnerValue(createBlankItems(nextValue, items.length)),

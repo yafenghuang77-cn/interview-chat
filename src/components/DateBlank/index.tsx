@@ -1,4 +1,4 @@
-import React, { useState, useImperativeHandle, forwardRef } from 'react';
+import React, { useState } from 'react';
 import { Picker, Text, View, type CommonEvent } from '@tarojs/components';
 import type { DateBlankProps, DateBlankRef } from './type';
 import {
@@ -15,7 +15,10 @@ import './style.less';
 type DateChangeEvent = CommonEvent<{ value: string }>;
 type DatetimeChangeEvent = CommonEvent<{ value: number[] }>;
 
-const DateBlank = forwardRef<DateBlankRef, DateBlankProps>((props, ref) => {
+/**
+ * 日期时间填空组件。支持日期模式和年月日时分秒选择回显。
+ */
+const DateBlank = React.forwardRef<DateBlankRef, DateBlankProps>((props, ref) => {
   const {
     questionId,
     mode = 'datetime',
@@ -36,7 +39,7 @@ const DateBlank = forwardRef<DateBlankRef, DateBlankProps>((props, ref) => {
   const currentValue = value !== undefined ? value : innerValue;
   const hasValue = Boolean(currentValue);
 
-  useImperativeHandle(
+  React.useImperativeHandle(
     ref,
     () => ({
       init: nextValue => setInnerValue(nextValue || null),
