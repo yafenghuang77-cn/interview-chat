@@ -460,6 +460,67 @@ import { ImageDisplay, VideoDisplay } from '@/components';
 
 `VideoDisplay` 的 `poster` 可选；不传时组件会在 H5 尝试抽取视频首帧作为封面，并让移动端视频节点预加载首帧。受浏览器、小程序合法域名和视频跨域策略影响，如果业务上要求封面 100% 稳定展示，建议直接传入 `poster`。
 
+## 矩阵组件
+
+矩阵组件包含 `MatrixSingleChoice`、`MatrixMultiChoice`、`MatrixRating`、`MatrixBidirectionalRating`。四个组件都只负责本地展示和交互，提交逻辑由页面按需接入。打分类组件复用公共五角星图标组件 `StarIcon`。
+
+矩阵单元格会根据自身内容自然撑开，内容较长时对应单元格会变宽；整体超出容器宽度时会使用 `ScrollView` 横向滑动，适配手机窄屏展示。
+
+打分类矩阵的横向标题和分值由 `columns` 配置决定，组件不会再根据 `maxScore` 自动生成 1-5 分列。
+
+```tsx
+import {
+  MatrixBidirectionalRating,
+  MatrixMultiChoice,
+  MatrixRating,
+  MatrixSingleChoice,
+} from '@/components';
+
+const rows = [
+  { value: 'taste', label: '口味' },
+  { value: 'service', label: '服务' },
+];
+
+const columns = [
+  { value: 'bad', label: '不满意' },
+  { value: 'normal', label: '一般' },
+  { value: 'good', label: '满意' },
+];
+
+<MatrixSingleChoice rows={rows} columns={columns} />
+<MatrixMultiChoice rows={rows} columns={columns} />
+<MatrixRating
+  rows={rows}
+  columns={[
+    { value: 1, label: '1分 完全不认可' },
+    { value: 2, label: '2分 不太认可' },
+    { value: 3, label: '3分 一般' },
+    { value: 4, label: '4分 比较认可' },
+    { value: 5, label: '5分 非常认可' },
+  ]}
+/>
+<MatrixBidirectionalRating
+  rows={rows}
+  columns={[
+    { value: 1, label: '1星 轻微偏向' },
+    { value: 2, label: '2星 有一点偏向' },
+    { value: 3, label: '3星 比较偏向' },
+    { value: 4, label: '4星 明显偏向' },
+    { value: 5, label: '5星 强烈偏向' },
+  ]}
+  leftLabel="传统"
+  rightLabel="创新"
+/>
+```
+
+| 组件 | 说明 |
+| --- | --- |
+| `MatrixSingleChoice` | 每一行只能选择一个列选项，返回 `{ [rowValue]: columnValue }` |
+| `MatrixMultiChoice` | 每一行可以选择多个列选项，返回 `{ [rowValue]: columnValue[] }` |
+| `MatrixRating` | 表格矩阵打分，布局与矩阵单选一致，只是单选按钮替换为五角星 |
+| `MatrixBidirectionalRating` | 双向矩阵打分，每个题项下方按上下两行展示两个方向的五角星 |
+| `StarIcon` | 公共五角星图标组件，供打分类组件复用 |
+
 ### MultiBlank
 
 ```tsx

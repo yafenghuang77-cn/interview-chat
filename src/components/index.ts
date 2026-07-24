@@ -12,6 +12,11 @@ export { default as DateBlank } from './DateBlank';
 export { default as MultiBlank } from './MultiBlank';
 export { default as ImageDisplay } from './ImageDisplay';
 export { default as VideoDisplay } from './VideoDisplay';
+export { default as StarIcon } from './StarIcon';
+export { default as MatrixSingleChoice } from './MatrixSingleChoice';
+export { default as MatrixMultiChoice } from './MatrixMultiChoice';
+export { default as MatrixRating } from './MatrixRating';
+export { default as MatrixBidirectionalRating } from './MatrixBidirectionalRating';
 export type {
   SingleChoiceChangePayload,
   SingleChoiceOption,
@@ -76,3 +81,42 @@ export type {
   VideoDisplayType,
   VideoDisplayVideo,
 } from './VideoDisplay';
+export type { StarIconProps } from './StarIcon';
+export type {
+  MatrixSingleChoiceAnswer,
+  MatrixSingleChoiceChangePayload,
+  MatrixSingleChoiceColumn,
+  MatrixSingleChoiceProps,
+  MatrixSingleChoiceRow,
+  MatrixSingleChoiceType,
+  MatrixSingleChoiceValue,
+} from './MatrixSingleChoice';
+export type {
+  MatrixMultiChoiceAnswer,
+  MatrixMultiChoiceChangePayload,
+  MatrixMultiChoiceColumn,
+  MatrixMultiChoiceProps,
+  MatrixMultiChoiceRow,
+  MatrixMultiChoiceType,
+  MatrixMultiChoiceValue,
+} from './MatrixMultiChoice';
+export type {
+  MatrixRatingAnswer,
+  MatrixRatingChangePayload,
+  MatrixRatingColumn,
+  MatrixRatingProps,
+  MatrixRatingRow,
+  MatrixRatingType,
+  MatrixRatingValue,
+} from './MatrixRating';
+export type {
+  MatrixBidirectionalRatingAnswer,
+  MatrixBidirectionalRatingChangePayload,
+  MatrixBidirectionalRatingColumn,
+  MatrixBidirectionalRatingProps,
+  MatrixBidirectionalRatingRow,
+  MatrixBidirectionalRatingScore,
+  MatrixBidirectionalRatingSide,
+  MatrixBidirectionalRatingType,
+  MatrixBidirectionalRatingValue,
+} from './MatrixBidirectionalRating';

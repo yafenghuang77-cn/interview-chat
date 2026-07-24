@@ -29,6 +29,14 @@ export const QUESTION_COMPONENT_TYPE = {
   IMAGE_DISPLAY: 'ImageDisplay',
   /** 视频展示 */
   VIDEO_DISPLAY: 'VideoDisplay',
+  /** 矩阵单选题 */
+  MATRIX_SINGLE_CHOICE: 'MatrixSingleChoice',
+  /** 矩阵多选题 */
+  MATRIX_MULTI_CHOICE: 'MatrixMultiChoice',
+  /** 矩阵打分题 */
+  MATRIX_RATING: 'MatrixRating',
+  /** 矩阵双向打分题 */
+  MATRIX_BIDIRECTIONAL_RATING: 'MatrixBidirectionalRating',
 } as const;
 
 /** 所有题目组件类型的联合类型。 */

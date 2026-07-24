@@ -1,0 +1,114 @@
+@wechat-primary: #07c160;
+@wechat-primary-light: #e8f8ee;
+@rating-border: #e6e6e6;
+@rating-text: #222222;
+@rating-text-weak: #8a8a8a;
+
+.matrix-rating {
+  width: 100%;
+  box-sizing: border-box;
+
+  &__scroll {
+    width: 100%;
+    box-sizing: border-box;
+    white-space: nowrap;
+  }
+
+  &__table {
+    display: inline-table;
+    min-width: 100%;
+    background: #fff;
+    border: 2px solid @rating-border;
+    border-radius: 16px;
+    border-collapse: separate;
+    border-spacing: 0;
+    overflow: hidden;
+    table-layout: auto;
+  }
+
+  &__row {
+    display: table-row;
+  }
+
+  &__head {
+    min-height: 76px;
+    background: #f7f8fa;
+  }
+
+  &__corner,
+  &__column,
+  &__row-title,
+  &__cell {
+    display: table-cell;
+    vertical-align: middle;
+    box-sizing: border-box;
+    padding: 18px 16px;
+    border-right: 2px solid @rating-border;
+    white-space: nowrap;
+  }
+
+  &__column {
+    color: @rating-text;
+    font-size: 24px;
+    line-height: 34px;
+    text-align: center;
+    overflow-wrap: anywhere;
+  }
+
+  &__column:last-child {
+    border-right: 0;
+  }
+
+  &__column-tip {
+    margin-top: 2px;
+    color: @rating-text-weak;
+    font-size: 20px;
+    line-height: 28px;
+  }
+
+  &__row-title {
+    color: @rating-text;
+    font-size: 26px;
+    line-height: 36px;
+    overflow-wrap: anywhere;
+  }
+
+  &__row--disabled {
+    opacity: 0.48;
+  }
+
+  &__description {
+    display: block;
+    margin-top: 6px;
+    color: @rating-text-weak;
+    font-size: 22px;
+    line-height: 30px;
+    overflow-wrap: anywhere;
+  }
+
+  &__cell {
+    min-width: 0;
+    height: 92px;
+    background: #fff;
+    text-align: center;
+  }
+
+  &__cell:last-child {
+    border-right: 0;
+  }
+
+  &__row:not(:last-child) > &__corner,
+  &__row:not(:last-child) > &__column,
+  &__row:not(:last-child) > &__row-title,
+  &__row:not(:last-child) > &__cell {
+    border-bottom: 2px solid @rating-border;
+  }
+
+  &__cell--checked {
+    background: @wechat-primary-light;
+  }
+
+  &__cell--disabled {
+    opacity: 0.48;
+  }
+}

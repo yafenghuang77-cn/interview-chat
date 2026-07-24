@@ -6,6 +6,10 @@ import {
   ImageDisplay,
   ImageMultiChoice,
   ImageSingleChoice,
+  MatrixBidirectionalRating,
+  MatrixMultiChoice,
+  MatrixRating,
+  MatrixSingleChoice,
   MultiBlank,
   MultiChoice,
   NumberBlank,
@@ -28,6 +32,24 @@ type ChoiceOptionConfig = {
   imageAlt?: string;
 };
 
+type MatrixRowConfig = {
+  id?: string | number;
+  value?: string | number;
+  label: string;
+  description?: string;
+  leftLabel?: string;
+  rightLabel?: string;
+  disabled?: boolean;
+};
+
+type MatrixColumnConfig = {
+  id?: string | number;
+  value?: string | number;
+  label: string;
+  description?: string;
+  disabled?: boolean;
+};
+
 type AnswerConfig = {
   type: QuestionComponentType;
   questionId: string;
@@ -45,7 +67,7 @@ type AnswerConfig = {
   errorMessage?: string;
   minMessage?: string;
   maxMessage?: string;
-  rows?: number;
+  rows?: number | MatrixRowConfig[];
   autoHeight?: boolean;
   mode?: 'date' | 'datetime';
   items?: Array<{
@@ -72,6 +94,9 @@ type AnswerConfig = {
     description?: string;
     poster?: string;
   }>;
+  columns?: MatrixColumnConfig[];
+  leftLabel?: string;
+  rightLabel?: string;
 };
 
 interface AnswerAreaListProps {
@@ -103,6 +128,27 @@ const AnswerAreaList: React.FC<AnswerAreaListProps> = props => {
     Array.isArray(options.defaultValue)
       ? options.defaultValue.map(item => String(item))
       : undefined;
+
+  const getTextBlankRows = (): number | undefined =>
+    typeof options.rows === 'number' ? options.rows : undefined;
+
+  const normalizeMatrixRows = () =>
+    (Array.isArray(options.rows) ? options.rows : []).map((item, index) => ({
+      ...item,
+      value: item.value ?? item.id ?? index,
+    }));
+
+  const normalizeMatrixColumns = () =>
+    (options.columns || []).map((item, index) => ({
+      ...item,
+      value: item.value ?? item.id ?? index,
+    }));
+
+  const normalizeMatrixRatingColumns = () =>
+    (options.columns || []).map((item, index) => ({
+      ...item,
+      value: Number(item.value ?? item.id ?? index + 1) || index + 1,
+    }));
 
   const renderItem = (type: string) => {
     switch (type) {
@@ -155,7 +201,7 @@ const AnswerAreaList: React.FC<AnswerAreaListProps> = props => {
             defaultValue={getDefaultTextValue()}
             disabled={options.disabled}
             maxlength={options.maxlength}
-            rows={options.rows}
+            rows={getTextBlankRows()}
             autoHeight={options.autoHeight}
           />
         );
@@ -244,6 +290,44 @@ const AnswerAreaList: React.FC<AnswerAreaListProps> = props => {
             description={options.description}
           />
         ) : null;
+
+      case QUESTION_COMPONENT_TYPE.MATRIX_SINGLE_CHOICE:
+        return (
+          <MatrixSingleChoice
+            rows={normalizeMatrixRows()}
+            columns={normalizeMatrixColumns()}
+            disabled={options.disabled}
+          />
+        );
+
+      case QUESTION_COMPONENT_TYPE.MATRIX_MULTI_CHOICE:
+        return (
+          <MatrixMultiChoice
+            rows={normalizeMatrixRows()}
+            columns={normalizeMatrixColumns()}
+            disabled={options.disabled}
+          />
+        );
+
+      case QUESTION_COMPONENT_TYPE.MATRIX_RATING:
+        return (
+          <MatrixRating
+            rows={normalizeMatrixRows()}
+            columns={normalizeMatrixRatingColumns()}
+            disabled={options.disabled}
+          />
+        );
+
+      case QUESTION_COMPONENT_TYPE.MATRIX_BIDIRECTIONAL_RATING:
+        return (
+          <MatrixBidirectionalRating
+            rows={normalizeMatrixRows()}
+            columns={normalizeMatrixRatingColumns()}
+            leftLabel={options.leftLabel}
+            rightLabel={options.rightLabel}
+            disabled={options.disabled}
+          />
+        );
     }
     return null;
   };
