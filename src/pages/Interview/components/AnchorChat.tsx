@@ -19,6 +19,7 @@ const AnchorChat: React.FC<AnchorChatProps> = props => {
 
       <View className="AnchorChat_message">
         {duration && <Text className="AnchorChat_duration">{duration}</Text>}
+
         <View className="AnchorChat_card">
           <Text className="AnchorChat_role">{role}</Text>
           <Text className="AnchorChat_content">{content}</Text>

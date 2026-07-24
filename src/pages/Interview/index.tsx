@@ -13,7 +13,9 @@ const InterviewPage: React.FC = () => {
           {mockData.map(item => {
             return (
               <View key={item.id} className="interview__round">
-                <AnchorChat content={item.content} role={item.role} />
+                {item.content && item.content.length > 0 && (
+                  <AnchorChat content={item.content} role={item.role} duration={item.duration} />
+                )}
               </View>
             );
           })}
