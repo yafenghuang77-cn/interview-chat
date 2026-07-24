@@ -13,6 +13,12 @@ export { default as MultiBlank } from './MultiBlank';
 export { default as ImageDisplay } from './ImageDisplay';
 export { default as VideoDisplay } from './VideoDisplay';
 export { default as StarIcon } from './StarIcon';
+export { default as HeartIcon } from './HeartIcon';
+export { default as Rating } from './Rating';
+export { default as NpsRating } from './NpsRating';
+export { default as BidirectionalRating } from './BidirectionalRating';
+export { default as MultiRating } from './MultiRating';
+export { default as MultiBidirectionalRating } from './MultiBidirectionalRating';
 export { default as MatrixSingleChoice } from './MatrixSingleChoice';
 export { default as MatrixMultiChoice } from './MatrixMultiChoice';
 export { default as MatrixRating } from './MatrixRating';
@@ -82,6 +88,49 @@ export type {
   VideoDisplayVideo,
 } from './VideoDisplay';
 export type { StarIconProps } from './StarIcon';
+export type { HeartIconProps } from './HeartIcon';
+export type {
+  RatingAnswer,
+  RatingChangePayload,
+  RatingOption,
+  RatingProps,
+  RatingType,
+} from './Rating';
+export type {
+  NpsRatingAnswer,
+  NpsRatingChangePayload,
+  NpsRatingOption,
+  NpsRatingProps,
+  NpsRatingType,
+} from './NpsRating';
+export type {
+  BidirectionalRatingAnswer,
+  BidirectionalRatingChangePayload,
+  BidirectionalRatingColumn,
+  BidirectionalRatingProps,
+  BidirectionalRatingSide,
+  BidirectionalRatingType,
+} from './BidirectionalRating';
+export type {
+  MultiRatingAnswer,
+  MultiRatingChangePayload,
+  MultiRatingColumn,
+  MultiRatingProps,
+  MultiRatingRow,
+  MultiRatingType,
+  MultiRatingValue,
+} from './MultiRating';
+export type {
+  MultiBidirectionalRatingAnswer,
+  MultiBidirectionalRatingChangePayload,
+  MultiBidirectionalRatingColumn,
+  MultiBidirectionalRatingProps,
+  MultiBidirectionalRatingRow,
+  MultiBidirectionalRatingScore,
+  MultiBidirectionalRatingSide,
+  MultiBidirectionalRatingType,
+  MultiBidirectionalRatingValue,
+} from './MultiBidirectionalRating';
 export type {
   MatrixSingleChoiceAnswer,
   MatrixSingleChoiceChangePayload,

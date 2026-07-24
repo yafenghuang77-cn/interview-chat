@@ -1,6 +1,7 @@
 import React from 'react';
 import { Text, View } from '@tarojs/components';
 import {
+  BidirectionalRating,
   DateBlank,
   EmailBlank,
   ImageDisplay,
@@ -10,10 +11,14 @@ import {
   MatrixMultiChoice,
   MatrixRating,
   MatrixSingleChoice,
+  MultiBidirectionalRating,
   MultiBlank,
   MultiChoice,
+  MultiRating,
+  NpsRating,
   NumberBlank,
   PhoneBlank,
+  Rating,
   SingleChoice,
   TextBlank,
   VideoDisplay,
@@ -95,6 +100,8 @@ type AnswerConfig = {
     poster?: string;
   }>;
   columns?: MatrixColumnConfig[];
+  lowLabel?: string;
+  highLabel?: string;
   leftLabel?: string;
   rightLabel?: string;
 };
@@ -149,6 +156,30 @@ const AnswerAreaList: React.FC<AnswerAreaListProps> = props => {
       ...item,
       value: Number(item.value ?? item.id ?? index + 1) || index + 1,
     }));
+
+  const normalizeNumericOptionValue = (
+    value: string | number | undefined,
+    fallback: number,
+  ): number => {
+    const nextValue = Number(value);
+
+    return Number.isFinite(nextValue) ? nextValue : fallback;
+  };
+
+  const normalizeRatingOptions = (fallbackStart = 1) => {
+    const ratingOptions =
+      options.columns && options.columns.length > 0
+        ? options.columns
+        : options.options || [];
+
+    return ratingOptions.map((item, index) => ({
+      ...item,
+      value: normalizeNumericOptionValue(
+        item.value ?? item.id,
+        index + fallbackStart,
+      ),
+    }));
+  };
 
   const renderItem = (type: string) => {
     switch (type) {
@@ -290,6 +321,54 @@ const AnswerAreaList: React.FC<AnswerAreaListProps> = props => {
             description={options.description}
           />
         ) : null;
+
+      case QUESTION_COMPONENT_TYPE.RATING:
+        return (
+          <Rating
+            options={normalizeRatingOptions()}
+            disabled={options.disabled}
+          />
+        );
+
+      case QUESTION_COMPONENT_TYPE.NPS:
+        return (
+          <NpsRating
+            options={normalizeRatingOptions(0)}
+            lowLabel={options.lowLabel}
+            highLabel={options.highLabel}
+            disabled={options.disabled}
+          />
+        );
+
+      case QUESTION_COMPONENT_TYPE.BIDIRECTIONAL_RATING:
+        return (
+          <BidirectionalRating
+            columns={normalizeMatrixRatingColumns()}
+            leftLabel={options.leftLabel}
+            rightLabel={options.rightLabel}
+            disabled={options.disabled}
+          />
+        );
+
+      case QUESTION_COMPONENT_TYPE.MULTI_RATING:
+        return (
+          <MultiRating
+            rows={normalizeMatrixRows()}
+            columns={normalizeMatrixRatingColumns()}
+            disabled={options.disabled}
+          />
+        );
+
+      case QUESTION_COMPONENT_TYPE.MULTI_BIDIRECTIONAL_RATING:
+        return (
+          <MultiBidirectionalRating
+            rows={normalizeMatrixRows()}
+            columns={normalizeMatrixRatingColumns()}
+            leftLabel={options.leftLabel}
+            rightLabel={options.rightLabel}
+            disabled={options.disabled}
+          />
+        );
 
       case QUESTION_COMPONENT_TYPE.MATRIX_SINGLE_CHOICE:
         return (

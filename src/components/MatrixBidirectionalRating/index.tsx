@@ -8,7 +8,9 @@ import type {
   MatrixBidirectionalRatingValue,
 } from './type';
 import {
+  getActiveScore,
   getBidirectionalRatingValue,
+  getNextRatingValue,
   getRecordKey,
   joinClassNames,
 } from './util';
@@ -43,12 +45,14 @@ const MatrixBidirectionalRating = <
       return;
     }
 
+    const currentRowValue = getBidirectionalRatingValue(currentValue, row.value);
     const nextValue = {
       ...currentValue,
-      [getRecordKey(row.value)]: {
+      [getRecordKey(row.value)]: getNextRatingValue(
+        currentRowValue,
         side,
         score,
-      },
+      ),
     };
 
     if (value === undefined) {
@@ -69,7 +73,7 @@ const MatrixBidirectionalRating = <
     rowDisabled: boolean,
   ) => {
     const rating = getBidirectionalRatingValue(currentValue, row.value);
-    const activeScore = rating?.side === side ? rating.score : 0;
+    const activeScore = getActiveScore(rating, side);
 
     return (
       <>

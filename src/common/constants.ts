@@ -29,6 +29,16 @@ export const QUESTION_COMPONENT_TYPE = {
   IMAGE_DISPLAY: 'ImageDisplay',
   /** 视频展示 */
   VIDEO_DISPLAY: 'VideoDisplay',
+  /** 打分题 */
+  RATING: 'Rating',
+  /** NPS 推荐度题 */
+  NPS: 'NpsRating',
+  /** 双向打分题 */
+  BIDIRECTIONAL_RATING: 'BidirectionalRating',
+  /** 多项打分题 */
+  MULTI_RATING: 'MultiRating',
+  /** 多项双向打分题 */
+  MULTI_BIDIRECTIONAL_RATING: 'MultiBidirectionalRating',
   /** 矩阵单选题 */
   MATRIX_SINGLE_CHOICE: 'MatrixSingleChoice',
   /** 矩阵多选题 */
@@ -68,5 +78,29 @@ export const BLANK_QUESTION_COMPONENTS = [
   {
     type: QUESTION_COMPONENT_TYPE.MULTI_BLANK,
     label: '多项填空',
+  },
+] as const;
+
+/** 打分题组件在配置面板或题型列表中的展示数据。 */
+export const RATING_QUESTION_COMPONENTS = [
+  {
+    type: QUESTION_COMPONENT_TYPE.RATING,
+    label: '打分题',
+  },
+  {
+    type: QUESTION_COMPONENT_TYPE.NPS,
+    label: 'NPS',
+  },
+  {
+    type: QUESTION_COMPONENT_TYPE.BIDIRECTIONAL_RATING,
+    label: '双向打分',
+  },
+  {
+    type: QUESTION_COMPONENT_TYPE.MULTI_RATING,
+    label: '多项打分',
+  },
+  {
+    type: QUESTION_COMPONENT_TYPE.MULTI_BIDIRECTIONAL_RATING,
+    label: '多项双向打分',
   },
 ] as const;

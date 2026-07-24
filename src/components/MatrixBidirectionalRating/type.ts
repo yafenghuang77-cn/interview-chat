@@ -26,8 +26,8 @@ export interface MatrixBidirectionalRatingColumn {
 }
 
 export interface MatrixBidirectionalRatingScore {
-  side: MatrixBidirectionalRatingSide;
-  score: number;
+  leftScore?: number;
+  rightScore?: number;
 }
 
 export type MatrixBidirectionalRatingAnswer<

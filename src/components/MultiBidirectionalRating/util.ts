@@ -1,8 +1,8 @@
 import type {
-  MatrixBidirectionalRatingAnswer,
-  MatrixBidirectionalRatingScore,
-  MatrixBidirectionalRatingSide,
-  MatrixBidirectionalRatingValue,
+  MultiBidirectionalRatingAnswer,
+  MultiBidirectionalRatingScore,
+  MultiBidirectionalRatingSide,
+  MultiBidirectionalRatingValue,
 } from './type';
 
 export const joinClassNames = (
@@ -10,28 +10,28 @@ export const joinClassNames = (
 ): string => classNames.filter(Boolean).join(' ');
 
 export const getRecordKey = (
-  value: MatrixBidirectionalRatingValue,
+  value: MultiBidirectionalRatingValue,
 ): string => String(value);
 
 export const getBidirectionalRatingValue = <
-  R extends MatrixBidirectionalRatingValue,
+  R extends MultiBidirectionalRatingValue,
 >(
-  answer: MatrixBidirectionalRatingAnswer<R>,
+  answer: MultiBidirectionalRatingAnswer<R>,
   rowValue: R,
-): MatrixBidirectionalRatingScore | undefined =>
+): MultiBidirectionalRatingScore | undefined =>
   answer[getRecordKey(rowValue) as R];
 
 export const getActiveScore = (
-  value: MatrixBidirectionalRatingScore | undefined,
-  side: MatrixBidirectionalRatingSide,
+  value: MultiBidirectionalRatingScore | undefined,
+  side: MultiBidirectionalRatingSide,
 ): number =>
   Number(value?.[side === 'left' ? 'leftScore' : 'rightScore'] || 0);
 
 export const getNextRatingValue = (
-  value: MatrixBidirectionalRatingScore | undefined,
-  side: MatrixBidirectionalRatingSide,
+  value: MultiBidirectionalRatingScore | undefined,
+  side: MultiBidirectionalRatingSide,
   score: number,
-): MatrixBidirectionalRatingScore => ({
+): MultiBidirectionalRatingScore => ({
   ...(value || {}),
   [side === 'left' ? 'leftScore' : 'rightScore']: score,
 });

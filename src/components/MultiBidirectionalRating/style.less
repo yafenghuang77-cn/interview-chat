@@ -1,0 +1,122 @@
+@rating-text: #222222;
+@rating-text-weak: #8a8a8a;
+
+.multi-bidirectional-rating {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+  box-sizing: border-box;
+
+  &__item {
+    width: 100%;
+    box-sizing: border-box;
+    overflow: hidden;
+    background: #fff;
+    border-radius: 16px;
+  }
+
+  &__item--disabled {
+    opacity: 0.48;
+  }
+
+  &__title {
+    padding: 22px 24px 18px;
+    box-sizing: border-box;
+    color: @rating-text;
+    font-size: 26px;
+    line-height: 36px;
+    overflow-wrap: anywhere;
+  }
+
+  &__description {
+    margin-top: 6px;
+    color: @rating-text-weak;
+    font-size: 22px;
+    line-height: 30px;
+    overflow-wrap: anywhere;
+  }
+
+  &__scroll {
+    width: 100%;
+    box-sizing: border-box;
+    white-space: nowrap;
+  }
+
+  &__content {
+    display: inline-flex;
+    flex-direction: column;
+    gap: 18px;
+    min-width: 100%;
+    padding: 18px;
+    box-sizing: border-box;
+  }
+
+  &__side {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    box-sizing: border-box;
+  }
+
+  &__label {
+    color: @rating-text;
+    font-size: 24px;
+    line-height: 34px;
+    overflow-wrap: anywhere;
+  }
+
+  &__scale {
+    display: inline-flex;
+    gap: 12px;
+  }
+
+  &__option {
+    flex: 1 0 auto;
+    min-width: 92px;
+    padding: 14px 12px;
+    box-sizing: border-box;
+    border-radius: 12px;
+    text-align: center;
+    background: #fff;
+    transition: background-color 0.18s ease;
+  }
+
+  &__option--checked {
+    background: #fff;
+  }
+
+  &__option--disabled {
+    opacity: 0.48;
+  }
+
+  &__star {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 42px;
+  }
+
+  &__option-label {
+    margin-top: 8px;
+    color: @rating-text;
+    font-size: 22px;
+    line-height: 30px;
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+
+  &__option-tip {
+    margin-top: 4px;
+    color: @rating-text-weak;
+    font-size: 20px;
+    line-height: 28px;
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+
+  &__option--checked &__option-label,
+  &__option--checked &__option-tip {
+    color: @rating-text;
+  }
+}
