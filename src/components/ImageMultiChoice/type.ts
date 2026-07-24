@@ -3,9 +3,7 @@ import type React from 'react';
 
 export type ImageMultiChoiceValue = string | number;
 
-export interface ImageMultiChoiceOption<
-  T extends ImageMultiChoiceValue = ImageMultiChoiceValue,
-> {
+export interface ImageMultiChoiceOption<T extends ImageMultiChoiceValue = ImageMultiChoiceValue> {
   label: React.ReactNode;
   value: T;
   image: string;
@@ -22,9 +20,20 @@ export interface ImageMultiChoiceChangePayload<
   checked: boolean;
 }
 
-export interface ImageMultiChoiceProps<
+export interface ImageMultiChoiceSubmitValue<
   T extends ImageMultiChoiceValue = ImageMultiChoiceValue,
 > {
+  questionId: string;
+  value: T[];
+}
+
+export interface ImageMultiChoiceRef<T extends ImageMultiChoiceValue = ImageMultiChoiceValue> {
+  init: (value?: T[]) => void;
+  getSubmitValue: () => ImageMultiChoiceSubmitValue<T>;
+}
+
+export interface ImageMultiChoiceProps<T extends ImageMultiChoiceValue = ImageMultiChoiceValue> {
+  questionId: string;
   options: Array<ImageMultiChoiceOption<T>>;
   value?: T[];
   defaultValue?: T[];

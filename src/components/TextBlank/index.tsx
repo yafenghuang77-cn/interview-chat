@@ -1,11 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, forwardRef, useImperativeHandle } from 'react';
 import { Textarea, View } from '@tarojs/components';
-import type { TextBlankProps } from './type';
+import type { TextBlankProps, TextBlankRef } from './type';
 import { getInputValue, getTextAreaHeight, joinClassNames } from './util';
 import './style.less';
 
-const TextBlank: React.FC<TextBlankProps> = props => {
+const TextBlank = forwardRef<TextBlankRef, TextBlankProps>((props, ref) => {
   const {
+    questionId,
     value,
     defaultValue = '',
     label,
@@ -22,6 +23,18 @@ const TextBlank: React.FC<TextBlankProps> = props => {
   const [innerValue, setInnerValue] = useState(defaultValue);
   const [focused, setFocused] = useState(false);
   const currentValue = value !== undefined ? value : innerValue;
+
+  useImperativeHandle(
+    ref,
+    () => ({
+      init: nextValue => setInnerValue(nextValue || ''),
+      getSubmitValue: () => ({
+        questionId,
+        value: currentValue,
+      }),
+    }),
+    [currentValue, questionId],
+  );
 
   return (
     <View className={joinClassNames(['text-blank', className])}>
@@ -60,11 +73,13 @@ const TextBlank: React.FC<TextBlankProps> = props => {
       </View>
     </View>
   );
-};
+});
 
 export default TextBlank;
 export type {
   TextBlankChangePayload,
   TextBlankProps,
+  TextBlankRef,
+  TextBlankSubmitValue,
   TextBlankType,
 } from './type';

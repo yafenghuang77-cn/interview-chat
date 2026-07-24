@@ -1,13 +1,15 @@
-import React, { useState } from 'react';
+import React, { useState, forwardRef, useImperativeHandle } from 'react';
 import { Text, View } from '@tarojs/components';
-import type { MultiChoiceOption, MultiChoiceProps } from './type';
+import type { MultiChoiceOption, MultiChoiceProps, MultiChoiceRef } from './type';
 import { joinClassNames } from './util';
 import './style.less';
 
-const MultiChoice = <T extends string | number = string | number>(
+const MultiChoiceInner = <T extends string | number = string | number>(
   props: MultiChoiceProps<T>,
+  ref: React.ForwardedRef<MultiChoiceRef<T>>,
 ): React.ReactElement => {
   const {
+    questionId,
     options,
     value,
     defaultValue = [],
@@ -18,6 +20,18 @@ const MultiChoice = <T extends string | number = string | number>(
   } = props;
   const [innerValue, setInnerValue] = useState<T[]>(defaultValue);
   const selectedValue = value !== undefined ? value : innerValue;
+
+  useImperativeHandle(
+    ref,
+    () => ({
+      init: nextValue => setInnerValue(nextValue || []),
+      getSubmitValue: () => ({
+        questionId,
+        value: selectedValue,
+      }),
+    }),
+    [questionId, selectedValue],
+  );
 
   const handleToggle = (option: MultiChoiceOption<T>): void => {
     const optionDisabled = disabled || option.disabled;
@@ -77,10 +91,16 @@ const MultiChoice = <T extends string | number = string | number>(
   );
 };
 
+const MultiChoice = forwardRef(MultiChoiceInner) as <T extends string | number = string | number>(
+  props: MultiChoiceProps<T> & React.RefAttributes<MultiChoiceRef<T>>,
+) => React.ReactElement;
+
 export default MultiChoice;
 export type {
   MultiChoiceChangePayload,
   MultiChoiceOption,
   MultiChoiceProps,
+  MultiChoiceRef,
+  MultiChoiceSubmitValue,
   MultiChoiceValue,
 } from './type';

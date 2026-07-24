@@ -9,8 +9,19 @@ export interface PhoneBlankChangePayload {
   error: string;
 }
 
+export interface PhoneBlankSubmitValue {
+  questionId: string;
+  value: string;
+}
+
+export interface PhoneBlankRef {
+  init: (value?: string) => void;
+  getSubmitValue: () => PhoneBlankSubmitValue;
+}
+
 export interface PhoneBlankProps {
   type?: PhoneBlankType;
+  questionId: string;
   value?: string;
   defaultValue?: string;
   label?: React.ReactNode;

@@ -4,9 +4,7 @@ import type { QUESTION_COMPONENT_TYPE } from '../../common/constants';
 export type MultiRatingType = typeof QUESTION_COMPONENT_TYPE.MULTI_RATING;
 export type MultiRatingValue = string | number;
 
-export interface MultiRatingRow<
-  T extends MultiRatingValue = MultiRatingValue,
-> {
+export interface MultiRatingRow<T extends MultiRatingValue = MultiRatingValue> {
   label: React.ReactNode;
   value: T;
   description?: React.ReactNode;
@@ -20,30 +18,34 @@ export interface MultiRatingColumn {
   disabled?: boolean;
 }
 
-export type MultiRatingAnswer<
-  R extends MultiRatingValue = MultiRatingValue,
-> = Partial<Record<R, number>>;
+export type MultiRatingAnswer<R extends MultiRatingValue = MultiRatingValue> = Partial<
+  Record<R, number>
+>;
 
-export interface MultiRatingChangePayload<
-  R extends MultiRatingValue = MultiRatingValue,
-> {
+export interface MultiRatingChangePayload<R extends MultiRatingValue = MultiRatingValue> {
   row: MultiRatingRow<R>;
   score: number;
   value: MultiRatingAnswer<R>;
 }
 
-export interface MultiRatingProps<
-  R extends MultiRatingValue = MultiRatingValue,
-> {
+export interface MultiRatingSubmitValue<R extends MultiRatingValue = MultiRatingValue> {
+  questionId: string;
+  value: MultiRatingAnswer<R>;
+}
+
+export interface MultiRatingRef<R extends MultiRatingValue = MultiRatingValue> {
+  init: (value?: MultiRatingAnswer<R>) => void;
+  getSubmitValue: () => MultiRatingSubmitValue<R>;
+}
+
+export interface MultiRatingProps<R extends MultiRatingValue = MultiRatingValue> {
   type?: MultiRatingType;
+  questionId: string;
   rows: Array<MultiRatingRow<R>>;
   columns: MultiRatingColumn[];
   value?: MultiRatingAnswer<R>;
   defaultValue?: MultiRatingAnswer<R>;
   disabled?: boolean;
   className?: string;
-  onChange?: (
-    value: MultiRatingAnswer<R>,
-    payload: MultiRatingChangePayload<R>,
-  ) => void;
+  onChange?: (value: MultiRatingAnswer<R>, payload: MultiRatingChangePayload<R>) => void;
 }

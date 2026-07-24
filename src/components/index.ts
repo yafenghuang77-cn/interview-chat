@@ -27,63 +27,87 @@ export type {
   SingleChoiceChangePayload,
   SingleChoiceOption,
   SingleChoiceProps,
+  SingleChoiceRef,
+  SingleChoiceSubmitValue,
   SingleChoiceValue,
 } from './SingleChoice';
 export type {
   MultiChoiceChangePayload,
   MultiChoiceOption,
   MultiChoiceProps,
+  MultiChoiceRef,
+  MultiChoiceSubmitValue,
   MultiChoiceValue,
 } from './MultiChoice';
 export type {
   ImageSingleChoiceChangePayload,
   ImageSingleChoiceOption,
   ImageSingleChoiceProps,
+  ImageSingleChoiceRef,
+  ImageSingleChoiceSubmitValue,
   ImageSingleChoiceValue,
 } from './ImageSingleChoice';
 export type {
   ImageMultiChoiceChangePayload,
   ImageMultiChoiceOption,
   ImageMultiChoiceProps,
+  ImageMultiChoiceRef,
+  ImageMultiChoiceSubmitValue,
   ImageMultiChoiceValue,
 } from './ImageMultiChoice';
 export type {
   TextBlankChangePayload,
   TextBlankProps,
+  TextBlankRef,
+  TextBlankSubmitValue,
   TextBlankType,
 } from './TextBlank';
 export type {
   PhoneBlankChangePayload,
   PhoneBlankProps,
+  PhoneBlankRef,
+  PhoneBlankSubmitValue,
   PhoneBlankType,
 } from './PhoneBlank';
 export type {
   EmailBlankChangePayload,
   EmailBlankProps,
+  EmailBlankRef,
+  EmailBlankSubmitValue,
   EmailBlankType,
 } from './EmailBlank';
 export type {
   NumberBlankChangePayload,
   NumberBlankProps,
+  NumberBlankRef,
+  NumberBlankSubmitValue,
   NumberBlankType,
 } from './NumberBlank';
 export type {
   DateBlankChangePayload,
   DateBlankProps,
+  DateBlankRef,
+  DateBlankSubmitValue,
   DateBlankType,
 } from './DateBlank';
 export type {
   MultiBlankChangePayload,
   MultiBlankProps,
+  MultiBlankRef,
+  MultiBlankSubmitValue,
   MultiBlankType,
 } from './MultiBlank';
 export type {
   ImageDisplayImage,
   ImageDisplayProps,
+  ImageDisplayRef,
+  ImageDisplaySubmitValue,
   ImageDisplayType,
 } from './ImageDisplay';
 export type {
   VideoDisplayProps,
+  VideoDisplayRef,
+  VideoDisplaySubmitValue,
   VideoDisplayType,
   VideoDisplayVideo,
 } from './VideoDisplay';
@@ -94,6 +118,8 @@ export type {
   RatingChangePayload,
   RatingOption,
   RatingProps,
+  RatingRef,
+  RatingSubmitValue,
   RatingType,
 } from './Rating';
 export type {
@@ -101,6 +127,8 @@ export type {
   NpsRatingChangePayload,
   NpsRatingOption,
   NpsRatingProps,
+  NpsRatingRef,
+  NpsRatingSubmitValue,
   NpsRatingType,
 } from './NpsRating';
 export type {
@@ -108,7 +136,9 @@ export type {
   BidirectionalRatingChangePayload,
   BidirectionalRatingColumn,
   BidirectionalRatingProps,
+  BidirectionalRatingRef,
   BidirectionalRatingSide,
+  BidirectionalRatingSubmitValue,
   BidirectionalRatingType,
 } from './BidirectionalRating';
 export type {
@@ -116,7 +146,9 @@ export type {
   MultiRatingChangePayload,
   MultiRatingColumn,
   MultiRatingProps,
+  MultiRatingRef,
   MultiRatingRow,
+  MultiRatingSubmitValue,
   MultiRatingType,
   MultiRatingValue,
 } from './MultiRating';
@@ -125,9 +157,11 @@ export type {
   MultiBidirectionalRatingChangePayload,
   MultiBidirectionalRatingColumn,
   MultiBidirectionalRatingProps,
+  MultiBidirectionalRatingRef,
   MultiBidirectionalRatingRow,
   MultiBidirectionalRatingScore,
   MultiBidirectionalRatingSide,
+  MultiBidirectionalRatingSubmitValue,
   MultiBidirectionalRatingType,
   MultiBidirectionalRatingValue,
 } from './MultiBidirectionalRating';
@@ -136,7 +170,9 @@ export type {
   MatrixSingleChoiceChangePayload,
   MatrixSingleChoiceColumn,
   MatrixSingleChoiceProps,
+  MatrixSingleChoiceRef,
   MatrixSingleChoiceRow,
+  MatrixSingleChoiceSubmitValue,
   MatrixSingleChoiceType,
   MatrixSingleChoiceValue,
 } from './MatrixSingleChoice';
@@ -145,7 +181,9 @@ export type {
   MatrixMultiChoiceChangePayload,
   MatrixMultiChoiceColumn,
   MatrixMultiChoiceProps,
+  MatrixMultiChoiceRef,
   MatrixMultiChoiceRow,
+  MatrixMultiChoiceSubmitValue,
   MatrixMultiChoiceType,
   MatrixMultiChoiceValue,
 } from './MatrixMultiChoice';
@@ -154,7 +192,9 @@ export type {
   MatrixRatingChangePayload,
   MatrixRatingColumn,
   MatrixRatingProps,
+  MatrixRatingRef,
   MatrixRatingRow,
+  MatrixRatingSubmitValue,
   MatrixRatingType,
   MatrixRatingValue,
 } from './MatrixRating';
@@ -163,9 +203,11 @@ export type {
   MatrixBidirectionalRatingChangePayload,
   MatrixBidirectionalRatingColumn,
   MatrixBidirectionalRatingProps,
+  MatrixBidirectionalRatingRef,
   MatrixBidirectionalRatingRow,
   MatrixBidirectionalRatingScore,
   MatrixBidirectionalRatingSide,
+  MatrixBidirectionalRatingSubmitValue,
   MatrixBidirectionalRatingType,
   MatrixBidirectionalRatingValue,
 } from './MatrixBidirectionalRating';

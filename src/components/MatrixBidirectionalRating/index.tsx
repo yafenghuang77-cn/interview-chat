@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, forwardRef, useImperativeHandle } from 'react';
 import { ScrollView, View } from '@tarojs/components';
 import StarIcon from '../StarIcon';
 import type {
   MatrixBidirectionalRatingProps,
+  MatrixBidirectionalRatingRef,
   MatrixBidirectionalRatingRow,
   MatrixBidirectionalRatingSide,
   MatrixBidirectionalRatingValue,
@@ -16,12 +17,14 @@ import {
 } from './util';
 import './style.less';
 
-const MatrixBidirectionalRating = <
+const MatrixBidirectionalRatingInner = <
   R extends MatrixBidirectionalRatingValue = MatrixBidirectionalRatingValue,
 >(
   props: MatrixBidirectionalRatingProps<R>,
+  ref: React.ForwardedRef<MatrixBidirectionalRatingRef<R>>,
 ): React.ReactElement => {
   const {
+    questionId,
     rows,
     columns,
     value,
@@ -36,6 +39,18 @@ const MatrixBidirectionalRating = <
   const currentValue = value !== undefined ? value : innerValue;
   const ratingColumns = columns;
 
+  useImperativeHandle(
+    ref,
+    () => ({
+      init: nextValue => setInnerValue(nextValue || {}),
+      getSubmitValue: () => ({
+        questionId,
+        value: currentValue,
+      }),
+    }),
+    [currentValue, questionId],
+  );
+
   const handleRate = (
     row: MatrixBidirectionalRatingRow<R>,
     side: MatrixBidirectionalRatingSide,
@@ -48,11 +63,7 @@ const MatrixBidirectionalRating = <
     const currentRowValue = getBidirectionalRatingValue(currentValue, row.value);
     const nextValue = {
       ...currentValue,
-      [getRecordKey(row.value)]: getNextRatingValue(
-        currentRowValue,
-        side,
-        score,
-      ),
+      [getRecordKey(row.value)]: getNextRatingValue(currentRowValue, side, score),
     };
 
     if (value === undefined) {
@@ -95,11 +106,7 @@ const MatrixBidirectionalRating = <
                 }
               }}
             >
-              <StarIcon
-                active={checked}
-                disabled={cellDisabled}
-                size={36}
-              />
+              <StarIcon active={checked} disabled={cellDisabled} size={36} />
             </View>
           );
         })}
@@ -123,23 +130,15 @@ const MatrixBidirectionalRating = <
             <View className="matrix-bidirectional-rating__title">
               <View>{row.label}</View>
               {row.description && (
-                <View className="matrix-bidirectional-rating__description">
-                  {row.description}
-                </View>
+                <View className="matrix-bidirectional-rating__description">{row.description}</View>
               )}
             </View>
-            <ScrollView
-              className="matrix-bidirectional-rating__scroll"
-              scrollX
-            >
+            <ScrollView className="matrix-bidirectional-rating__scroll" scrollX>
               <View className="matrix-bidirectional-rating__table">
                 <View className="matrix-bidirectional-rating__head">
                   <View className="matrix-bidirectional-rating__head-label" />
                   {ratingColumns.map(column => (
-                    <View
-                      key={column.value}
-                      className="matrix-bidirectional-rating__column"
-                    >
+                    <View key={column.value} className="matrix-bidirectional-rating__column">
                       {column.label}
                       {column.description && (
                         <View className="matrix-bidirectional-rating__column-tip">
@@ -170,15 +169,23 @@ const MatrixBidirectionalRating = <
   );
 };
 
+const MatrixBidirectionalRating = forwardRef(MatrixBidirectionalRatingInner) as <
+  R extends MatrixBidirectionalRatingValue = MatrixBidirectionalRatingValue,
+>(
+  props: MatrixBidirectionalRatingProps<R> & React.RefAttributes<MatrixBidirectionalRatingRef<R>>,
+) => React.ReactElement;
+
 export default MatrixBidirectionalRating;
 export type {
   MatrixBidirectionalRatingAnswer,
   MatrixBidirectionalRatingChangePayload,
   MatrixBidirectionalRatingColumn,
   MatrixBidirectionalRatingProps,
+  MatrixBidirectionalRatingRef,
   MatrixBidirectionalRatingRow,
   MatrixBidirectionalRatingScore,
   MatrixBidirectionalRatingSide,
+  MatrixBidirectionalRatingSubmitValue,
   MatrixBidirectionalRatingType,
   MatrixBidirectionalRatingValue,
 } from './type';

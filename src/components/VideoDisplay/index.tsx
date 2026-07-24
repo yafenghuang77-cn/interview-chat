@@ -1,14 +1,6 @@
-import React from 'react';
-import {
-  Swiper,
-  SwiperItem,
-  Text,
-  Video,
-  View,
-  Image,
-  type SwiperProps,
-} from '@tarojs/components';
-import type { VideoDisplayProps } from './type';
+import React, { forwardRef, useImperativeHandle } from 'react';
+import { Swiper, SwiperItem, Text, Video, View, Image, type SwiperProps } from '@tarojs/components';
+import type { VideoDisplayProps, VideoDisplayRef, VideoDisplayVideo } from './type';
 import {
   createFirstFramePoster,
   FIRST_FRAME_TIME,
@@ -20,34 +12,18 @@ import {
 } from './util';
 import './style.less';
 
-const VideoDisplay: React.FC<VideoDisplayProps> = props => {
-  const {
-    videos,
-    src,
-    title,
-    description,
-    poster,
-    className = '',
-  } = props;
-  const videoList = normalizeVideos(videos, src, poster, title, description);
+const VideoDisplay = forwardRef<VideoDisplayRef, VideoDisplayProps>((props, ref) => {
+  const { questionId, videos, src, title, description, poster, className = '' } = props;
+  const [innerVideos, setInnerVideos] = React.useState<VideoDisplayVideo[] | null>(null);
+  const videoList = innerVideos || normalizeVideos(videos, src, poster, title, description);
   const [previewIndex, setPreviewIndex] = React.useState<number | null>(null);
-  const [firstFramePosters, setFirstFramePosters] = React.useState<
-    Record<string, string>
-  >({});
+  const [firstFramePosters, setFirstFramePosters] = React.useState<Record<string, string>>({});
 
   const openPreview = async (index: number) => {
-    const openedNativePreview = await previewVideos(
-      videoList,
-      index,
-      firstFramePosters,
-    );
+    const openedNativePreview = await previewVideos(videoList, index, firstFramePosters);
 
     if (!openedNativePreview) {
-      const { current } = getVideoPreviewOptions(
-        videoList,
-        index,
-        firstFramePosters,
-      );
+      const { current } = getVideoPreviewOptions(videoList, index, firstFramePosters);
       setPreviewIndex(current);
     }
   };
@@ -55,6 +31,18 @@ const VideoDisplay: React.FC<VideoDisplayProps> = props => {
   const closePreview = () => {
     setPreviewIndex(null);
   };
+
+  useImperativeHandle(
+    ref,
+    () => ({
+      init: nextValue => setInnerVideos(nextValue || []),
+      getSubmitValue: () => ({
+        questionId,
+        value: videoList,
+      }),
+    }),
+    [questionId, videoList],
+  );
 
   const handlePreviewChange: SwiperProps['onChange'] = event => {
     setPreviewIndex(event.detail.current);
@@ -94,9 +82,7 @@ const VideoDisplay: React.FC<VideoDisplayProps> = props => {
   return (
     <View className={joinClassNames(['video-display', className])}>
       {title && <View className="video-display__title">{title}</View>}
-      {description && (
-        <View className="video-display__description">{description}</View>
-      )}
+      {description && <View className="video-display__description">{description}</View>}
       <View className="video-display__list">
         {videoList.map((item, index) => (
           <View key={`${item.src}-${index}`} className="video-display__frame">
@@ -143,13 +129,9 @@ const VideoDisplay: React.FC<VideoDisplayProps> = props => {
                 <Text>播放</Text>
               </View>
             </View>
-            {item.title && (
-              <View className="video-display__item-title">{item.title}</View>
-            )}
+            {item.title && <View className="video-display__item-title">{item.title}</View>}
             {item.description && (
-              <View className="video-display__item-description">
-                {item.description}
-              </View>
+              <View className="video-display__item-description">{item.description}</View>
             )}
           </View>
         ))}
@@ -190,11 +172,13 @@ const VideoDisplay: React.FC<VideoDisplayProps> = props => {
       )}
     </View>
   );
-};
+});
 
 export default VideoDisplay;
 export type {
   VideoDisplayProps,
+  VideoDisplayRef,
+  VideoDisplaySubmitValue,
   VideoDisplayType,
   VideoDisplayVideo,
 } from './type';

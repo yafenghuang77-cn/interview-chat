@@ -12,8 +12,19 @@ export interface ImageDisplayImage {
   alt?: string;
 }
 
+export interface ImageDisplaySubmitValue {
+  questionId: string;
+  value: ImageDisplayImage[];
+}
+
+export interface ImageDisplayRef {
+  init: (value?: ImageDisplayImage[]) => void;
+  getSubmitValue: () => ImageDisplaySubmitValue;
+}
+
 export interface ImageDisplayProps {
   type?: ImageDisplayType;
+  questionId: string;
   images: ImageDisplayImage[];
   title?: React.ReactNode;
   description?: React.ReactNode;

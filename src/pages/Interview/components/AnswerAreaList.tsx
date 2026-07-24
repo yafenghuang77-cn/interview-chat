@@ -55,7 +55,7 @@ type MatrixColumnConfig = {
   disabled?: boolean;
 };
 
-type AnswerConfig = {
+export type AnswerConfig = {
   type: QuestionComponentType;
   questionId: string;
   questionText: string;
@@ -123,8 +123,7 @@ const AnswerAreaList: React.FC<AnswerAreaListProps> = props => {
     typeof options.defaultValue === 'string' ? options.defaultValue : '';
 
   const getDefaultChoiceValue = (): string | number | null =>
-    typeof options.defaultValue === 'string' ||
-    typeof options.defaultValue === 'number'
+    typeof options.defaultValue === 'string' || typeof options.defaultValue === 'number'
       ? options.defaultValue
       : null;
 
@@ -168,16 +167,11 @@ const AnswerAreaList: React.FC<AnswerAreaListProps> = props => {
 
   const normalizeRatingOptions = (fallbackStart = 1) => {
     const ratingOptions =
-      options.columns && options.columns.length > 0
-        ? options.columns
-        : options.options || [];
+      options.columns && options.columns.length > 0 ? options.columns : options.options || [];
 
     return ratingOptions.map((item, index) => ({
       ...item,
-      value: normalizeNumericOptionValue(
-        item.value ?? item.id,
-        index + fallbackStart,
-      ),
+      value: normalizeNumericOptionValue(item.value ?? item.id, index + fallbackStart),
     }));
   };
 
@@ -186,6 +180,7 @@ const AnswerAreaList: React.FC<AnswerAreaListProps> = props => {
       case QUESTION_COMPONENT_TYPE.SINGLE_CHOICE:
         return (
           <SingleChoice
+            questionId={options.questionId}
             options={normalizeChoiceOptions()}
             defaultValue={getDefaultChoiceValue()}
             disabled={options.disabled}
@@ -195,6 +190,7 @@ const AnswerAreaList: React.FC<AnswerAreaListProps> = props => {
       case QUESTION_COMPONENT_TYPE.MULTI_CHOICE:
         return (
           <MultiChoice
+            questionId={options.questionId}
             options={normalizeChoiceOptions()}
             defaultValue={getDefaultChoiceValues()}
             disabled={options.disabled}
@@ -204,6 +200,7 @@ const AnswerAreaList: React.FC<AnswerAreaListProps> = props => {
       case QUESTION_COMPONENT_TYPE.IMAGE_SINGLE_CHOICE:
         return (
           <ImageSingleChoice
+            questionId={options.questionId}
             options={normalizeChoiceOptions().map(item => ({
               ...item,
               image: item.image || '',
@@ -216,6 +213,7 @@ const AnswerAreaList: React.FC<AnswerAreaListProps> = props => {
       case QUESTION_COMPONENT_TYPE.IMAGE_MULTI_CHOICE:
         return (
           <ImageMultiChoice
+            questionId={options.questionId}
             options={normalizeChoiceOptions().map(item => ({
               ...item,
               image: item.image || '',
@@ -228,6 +226,7 @@ const AnswerAreaList: React.FC<AnswerAreaListProps> = props => {
       case QUESTION_COMPONENT_TYPE.TEXT_BLANK:
         return (
           <TextBlank
+            questionId={options.questionId}
             placeholder={options.placeholder}
             defaultValue={getDefaultTextValue()}
             disabled={options.disabled}
@@ -240,6 +239,7 @@ const AnswerAreaList: React.FC<AnswerAreaListProps> = props => {
       case QUESTION_COMPONENT_TYPE.PHONE_BLANK:
         return (
           <PhoneBlank
+            questionId={options.questionId}
             placeholder={options.placeholder}
             defaultValue={getDefaultTextValue()}
             disabled={options.disabled}
@@ -253,6 +253,7 @@ const AnswerAreaList: React.FC<AnswerAreaListProps> = props => {
       case QUESTION_COMPONENT_TYPE.EMAIL_BLANK:
         return (
           <EmailBlank
+            questionId={options.questionId}
             placeholder={options.placeholder}
             defaultValue={getDefaultTextValue()}
             disabled={options.disabled}
@@ -266,6 +267,7 @@ const AnswerAreaList: React.FC<AnswerAreaListProps> = props => {
       case QUESTION_COMPONENT_TYPE.NUMBER_BLANK:
         return (
           <NumberBlank
+            questionId={options.questionId}
             placeholder={options.placeholder}
             defaultValue={getDefaultTextValue()}
             disabled={options.disabled}
@@ -283,6 +285,7 @@ const AnswerAreaList: React.FC<AnswerAreaListProps> = props => {
       case QUESTION_COMPONENT_TYPE.DATE_BLANK:
         return (
           <DateBlank
+            questionId={options.questionId}
             placeholder={options.placeholder}
             defaultValue={getDefaultChoiceValue()?.toString() || null}
             mode={options.mode}
@@ -296,6 +299,7 @@ const AnswerAreaList: React.FC<AnswerAreaListProps> = props => {
       case QUESTION_COMPONENT_TYPE.MULTI_BLANK:
         return (
           <MultiBlank
+            questionId={options.questionId}
             items={options.items || []}
             placeholder={options.placeholder}
             defaultValue={getDefaultMultiBlankValue()}
@@ -307,6 +311,7 @@ const AnswerAreaList: React.FC<AnswerAreaListProps> = props => {
       case QUESTION_COMPONENT_TYPE.IMAGE_DISPLAY:
         return (
           <ImageDisplay
+            questionId={options.questionId}
             images={options.images || []}
             preview={options.preview}
           />
@@ -315,6 +320,7 @@ const AnswerAreaList: React.FC<AnswerAreaListProps> = props => {
       case QUESTION_COMPONENT_TYPE.VIDEO_DISPLAY:
         return options.src || (options.videos && options.videos.length > 0) ? (
           <VideoDisplay
+            questionId={options.questionId}
             videos={options.videos}
             src={options.src}
             poster={options.poster}
@@ -325,6 +331,7 @@ const AnswerAreaList: React.FC<AnswerAreaListProps> = props => {
       case QUESTION_COMPONENT_TYPE.RATING:
         return (
           <Rating
+            questionId={options.questionId}
             options={normalizeRatingOptions()}
             disabled={options.disabled}
           />
@@ -333,6 +340,7 @@ const AnswerAreaList: React.FC<AnswerAreaListProps> = props => {
       case QUESTION_COMPONENT_TYPE.NPS:
         return (
           <NpsRating
+            questionId={options.questionId}
             options={normalizeRatingOptions(0)}
             lowLabel={options.lowLabel}
             highLabel={options.highLabel}
@@ -343,6 +351,7 @@ const AnswerAreaList: React.FC<AnswerAreaListProps> = props => {
       case QUESTION_COMPONENT_TYPE.BIDIRECTIONAL_RATING:
         return (
           <BidirectionalRating
+            questionId={options.questionId}
             columns={normalizeMatrixRatingColumns()}
             leftLabel={options.leftLabel}
             rightLabel={options.rightLabel}
@@ -353,6 +362,7 @@ const AnswerAreaList: React.FC<AnswerAreaListProps> = props => {
       case QUESTION_COMPONENT_TYPE.MULTI_RATING:
         return (
           <MultiRating
+            questionId={options.questionId}
             rows={normalizeMatrixRows()}
             columns={normalizeMatrixRatingColumns()}
             disabled={options.disabled}
@@ -362,6 +372,7 @@ const AnswerAreaList: React.FC<AnswerAreaListProps> = props => {
       case QUESTION_COMPONENT_TYPE.MULTI_BIDIRECTIONAL_RATING:
         return (
           <MultiBidirectionalRating
+            questionId={options.questionId}
             rows={normalizeMatrixRows()}
             columns={normalizeMatrixRatingColumns()}
             leftLabel={options.leftLabel}
@@ -373,6 +384,7 @@ const AnswerAreaList: React.FC<AnswerAreaListProps> = props => {
       case QUESTION_COMPONENT_TYPE.MATRIX_SINGLE_CHOICE:
         return (
           <MatrixSingleChoice
+            questionId={options.questionId}
             rows={normalizeMatrixRows()}
             columns={normalizeMatrixColumns()}
             disabled={options.disabled}
@@ -382,6 +394,7 @@ const AnswerAreaList: React.FC<AnswerAreaListProps> = props => {
       case QUESTION_COMPONENT_TYPE.MATRIX_MULTI_CHOICE:
         return (
           <MatrixMultiChoice
+            questionId={options.questionId}
             rows={normalizeMatrixRows()}
             columns={normalizeMatrixColumns()}
             disabled={options.disabled}
@@ -391,6 +404,7 @@ const AnswerAreaList: React.FC<AnswerAreaListProps> = props => {
       case QUESTION_COMPONENT_TYPE.MATRIX_RATING:
         return (
           <MatrixRating
+            questionId={options.questionId}
             rows={normalizeMatrixRows()}
             columns={normalizeMatrixRatingColumns()}
             disabled={options.disabled}
@@ -400,6 +414,7 @@ const AnswerAreaList: React.FC<AnswerAreaListProps> = props => {
       case QUESTION_COMPONENT_TYPE.MATRIX_BIDIRECTIONAL_RATING:
         return (
           <MatrixBidirectionalRating
+            questionId={options.questionId}
             rows={normalizeMatrixRows()}
             columns={normalizeMatrixRatingColumns()}
             leftLabel={options.leftLabel}

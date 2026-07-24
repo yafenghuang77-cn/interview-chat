@@ -1,8 +1,7 @@
 import type React from 'react';
 import type { QUESTION_COMPONENT_TYPE } from '../../common/constants';
 
-export type MatrixSingleChoiceType =
-  typeof QUESTION_COMPONENT_TYPE.MATRIX_SINGLE_CHOICE;
+export type MatrixSingleChoiceType = typeof QUESTION_COMPONENT_TYPE.MATRIX_SINGLE_CHOICE;
 
 export type MatrixSingleChoiceValue = string | number;
 
@@ -37,11 +36,28 @@ export interface MatrixSingleChoiceChangePayload<
   value: MatrixSingleChoiceAnswer<R, C>;
 }
 
+export interface MatrixSingleChoiceSubmitValue<
+  R extends MatrixSingleChoiceValue = MatrixSingleChoiceValue,
+  C extends MatrixSingleChoiceValue = MatrixSingleChoiceValue,
+> {
+  questionId: string;
+  value: MatrixSingleChoiceAnswer<R, C>;
+}
+
+export interface MatrixSingleChoiceRef<
+  R extends MatrixSingleChoiceValue = MatrixSingleChoiceValue,
+  C extends MatrixSingleChoiceValue = MatrixSingleChoiceValue,
+> {
+  init: (value?: MatrixSingleChoiceAnswer<R, C>) => void;
+  getSubmitValue: () => MatrixSingleChoiceSubmitValue<R, C>;
+}
+
 export interface MatrixSingleChoiceProps<
   R extends MatrixSingleChoiceValue = MatrixSingleChoiceValue,
   C extends MatrixSingleChoiceValue = MatrixSingleChoiceValue,
 > {
   type?: MatrixSingleChoiceType;
+  questionId: string;
   rows: Array<MatrixSingleChoiceRow<R>>;
   columns: Array<MatrixSingleChoiceColumn<C>>;
   value?: MatrixSingleChoiceAnswer<R, C>;

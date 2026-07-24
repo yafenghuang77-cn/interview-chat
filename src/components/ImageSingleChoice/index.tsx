@@ -1,13 +1,15 @@
-import React, { useState } from 'react';
+import React, { useState, forwardRef, useImperativeHandle } from 'react';
 import { Image, View } from '@tarojs/components';
-import type { ImageSingleChoiceOption, ImageSingleChoiceProps } from './type';
+import type { ImageSingleChoiceOption, ImageSingleChoiceProps, ImageSingleChoiceRef } from './type';
 import { joinClassNames } from './util';
 import './style.less';
 
-const ImageSingleChoice = <T extends string | number = string | number>(
+const ImageSingleChoiceInner = <T extends string | number = string | number>(
   props: ImageSingleChoiceProps<T>,
+  ref: React.ForwardedRef<ImageSingleChoiceRef<T>>,
 ): React.ReactElement => {
   const {
+    questionId,
     options,
     value,
     defaultValue = null,
@@ -18,6 +20,18 @@ const ImageSingleChoice = <T extends string | number = string | number>(
   } = props;
   const [innerValue, setInnerValue] = useState<T | null>(defaultValue);
   const selectedValue = value !== undefined ? value : innerValue;
+
+  useImperativeHandle(
+    ref,
+    () => ({
+      init: nextValue => setInnerValue(nextValue ?? null),
+      getSubmitValue: () => ({
+        questionId,
+        value: selectedValue,
+      }),
+    }),
+    [questionId, selectedValue],
+  );
 
   const handleSelect = (option: ImageSingleChoiceOption<T>): void => {
     const optionDisabled = disabled || option.disabled;
@@ -67,19 +81,13 @@ const ImageSingleChoice = <T extends string | number = string | number>(
                   checked && 'image-single-choice__indicator--checked',
                 ])}
               >
-                {checked && (
-                  <View className="image-single-choice__indicator-dot" />
-                )}
+                {checked && <View className="image-single-choice__indicator-dot" />}
               </View>
 
               <View className="image-single-choice__content">
-                <View className="image-single-choice__label">
-                  {option.label}
-                </View>
+                <View className="image-single-choice__label">{option.label}</View>
                 {option.description && (
-                  <View className="image-single-choice__description">
-                    {option.description}
-                  </View>
+                  <View className="image-single-choice__description">{option.description}</View>
                 )}
               </View>
             </View>
@@ -90,10 +98,18 @@ const ImageSingleChoice = <T extends string | number = string | number>(
   );
 };
 
+const ImageSingleChoice = forwardRef(ImageSingleChoiceInner) as <
+  T extends string | number = string | number,
+>(
+  props: ImageSingleChoiceProps<T> & React.RefAttributes<ImageSingleChoiceRef<T>>,
+) => React.ReactElement;
+
 export default ImageSingleChoice;
 export type {
   ImageSingleChoiceChangePayload,
   ImageSingleChoiceOption,
   ImageSingleChoiceProps,
+  ImageSingleChoiceRef,
+  ImageSingleChoiceSubmitValue,
   ImageSingleChoiceValue,
 } from './type';

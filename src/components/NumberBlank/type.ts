@@ -10,8 +10,19 @@ export interface NumberBlankChangePayload {
   error: string;
 }
 
+export interface NumberBlankSubmitValue {
+  questionId: string;
+  value: string;
+}
+
+export interface NumberBlankRef {
+  init: (value?: string) => void;
+  getSubmitValue: () => NumberBlankSubmitValue;
+}
+
 export interface NumberBlankProps {
   type?: NumberBlankType;
+  questionId: string;
   value?: string;
   defaultValue?: string;
   label?: React.ReactNode;

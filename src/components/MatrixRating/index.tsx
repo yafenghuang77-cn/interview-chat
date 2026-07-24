@@ -1,20 +1,21 @@
-import React, { useState } from 'react';
+import React, { useState, forwardRef, useImperativeHandle } from 'react';
 import { ScrollView, View } from '@tarojs/components';
 import StarIcon from '../StarIcon';
 import type {
   MatrixRatingProps,
+  MatrixRatingRef,
   MatrixRatingRow,
   MatrixRatingValue,
 } from './type';
 import { getRatingValue, getRecordKey, joinClassNames } from './util';
 import './style.less';
 
-const MatrixRating = <
-  R extends MatrixRatingValue = MatrixRatingValue,
->(
+const MatrixRatingInner = <R extends MatrixRatingValue = MatrixRatingValue>(
   props: MatrixRatingProps<R>,
+  ref: React.ForwardedRef<MatrixRatingRef<R>>,
 ): React.ReactElement => {
   const {
+    questionId,
     rows,
     columns,
     value,
@@ -26,6 +27,18 @@ const MatrixRating = <
   const [innerValue, setInnerValue] = useState(defaultValue);
   const currentValue = value !== undefined ? value : innerValue;
   const ratingColumns = columns;
+
+  useImperativeHandle(
+    ref,
+    () => ({
+      init: nextValue => setInnerValue(nextValue || {}),
+      getSubmitValue: () => ({
+        questionId,
+        value: currentValue,
+      }),
+    }),
+    [currentValue, questionId],
+  );
 
   const handleRate = (row: MatrixRatingRow<R>, score: number): void => {
     if (disabled || row.disabled) {
@@ -58,9 +71,7 @@ const MatrixRating = <
               <View key={column.value} className="matrix-rating__column">
                 {column.label}
                 {column.description && (
-                  <View className="matrix-rating__column-tip">
-                    {column.description}
-                  </View>
+                  <View className="matrix-rating__column-tip">{column.description}</View>
                 )}
               </View>
             ))}
@@ -80,9 +91,7 @@ const MatrixRating = <
                 <View className="matrix-rating__row-title">
                   <View>{row.label}</View>
                   {row.description && (
-                    <View className="matrix-rating__description">
-                      {row.description}
-                    </View>
+                    <View className="matrix-rating__description">{row.description}</View>
                   )}
                 </View>
                 {ratingColumns.map(column => {
@@ -103,11 +112,7 @@ const MatrixRating = <
                         }
                       }}
                     >
-                      <StarIcon
-                        active={checked}
-                        disabled={cellDisabled}
-                        size={36}
-                      />
+                      <StarIcon active={checked} disabled={cellDisabled} size={36} />
                     </View>
                   );
                 })}
@@ -120,13 +125,21 @@ const MatrixRating = <
   );
 };
 
+const MatrixRating = forwardRef(MatrixRatingInner) as <
+  R extends MatrixRatingValue = MatrixRatingValue,
+>(
+  props: MatrixRatingProps<R> & React.RefAttributes<MatrixRatingRef<R>>,
+) => React.ReactElement;
+
 export default MatrixRating;
 export type {
   MatrixRatingAnswer,
   MatrixRatingChangePayload,
   MatrixRatingColumn,
   MatrixRatingProps,
+  MatrixRatingRef,
   MatrixRatingRow,
+  MatrixRatingSubmitValue,
   MatrixRatingType,
   MatrixRatingValue,
 } from './type';

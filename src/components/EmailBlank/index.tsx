@@ -1,11 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useImperativeHandle, forwardRef } from 'react';
 import { Input, Text, View } from '@tarojs/components';
-import type { EmailBlankProps } from './type';
+import type { EmailBlankProps, EmailBlankRef } from './type';
 import { getInputValue, joinClassNames, validateEmailValue } from './util';
 import './style.less';
 
-const EmailBlank: React.FC<EmailBlankProps> = props => {
+const EmailBlank = forwardRef<EmailBlankRef, EmailBlankProps>((props, ref) => {
   const {
+    questionId,
     value,
     defaultValue = '',
     label,
@@ -25,8 +26,7 @@ const EmailBlank: React.FC<EmailBlankProps> = props => {
   const [error, setError] = useState('');
   const currentValue = value !== undefined ? value : innerValue;
   const validateValue = (nextValue: string): string =>
-    validate?.(nextValue) ||
-    validateEmailValue(nextValue, required, requiredMessage, errorMessage);
+    validate?.(nextValue) || validateEmailValue(nextValue, required, requiredMessage, errorMessage);
 
   const emitChange = (nextValue: string, nextError: string): void => {
     onChange?.(nextValue, {
@@ -35,6 +35,21 @@ const EmailBlank: React.FC<EmailBlankProps> = props => {
       error: nextError,
     });
   };
+
+  useImperativeHandle(
+    ref,
+    () => ({
+      init: nextValue => {
+        setInnerValue(nextValue || '');
+        setError('');
+      },
+      getSubmitValue: () => ({
+        questionId,
+        value: currentValue,
+      }),
+    }),
+    [currentValue, questionId],
+  );
 
   return (
     <View className={joinClassNames(['email-blank', className])}>
@@ -81,11 +96,13 @@ const EmailBlank: React.FC<EmailBlankProps> = props => {
       {error && <Text className="email-blank__error">{error}</Text>}
     </View>
   );
-};
+});
 
 export default EmailBlank;
 export type {
   EmailBlankChangePayload,
   EmailBlankProps,
+  EmailBlankRef,
+  EmailBlankSubmitValue,
   EmailBlankType,
 } from './type';

@@ -3,8 +3,25 @@ import { QUESTION_COMPONENT_TYPE } from './constants';
 const now = Date.now();
 const minute = 60 * 1000;
 
+/**
+ * @typedef {import('../pages/Interview/hooks/useCountdown').CountdownDuration} CountdownDuration
+ * @typedef {import('../pages/Interview/components/AnswerAreaList').AnswerConfig} AnswerConfig
+ * @typedef {{
+ *   id: number;
+ *   role?: string;
+ *   content?: string;
+ *   duration?: CountdownDuration;
+ *   config: AnswerConfig | null;
+ * }} MockInterviewItem
+ */
+
+/**
+ * @param {number} minutes
+ * @returns {CountdownDuration}
+ */
 const createDuration = minutes => [now, now + minutes * minute];
 
+/** @type {MockInterviewItem[]} */
 const data = [
   {
     id: 1,
@@ -401,8 +418,7 @@ const data = [
     config: {
       type: QUESTION_COMPONENT_TYPE.MATRIX_BIDIRECTIONAL_RATING,
       questionId: 'q16',
-      questionText:
-        '下面每一项都有两种相反感受，请选择你认为更贴近该品牌的一侧，并用星级表示偏向强度。',
+      questionText: '下面每一项都有两种相反感受，请选择你认为更贴近该品牌的一侧，并用星级表示偏向强度。',
       leftLabel: '偏左',
       rightLabel: '偏右',
       columns: [
@@ -476,6 +492,7 @@ const data = [
       lowLabel: '0 表示完全不可能',
       highLabel: '10 表示非常可能',
       columns: [
+        { id: 'nps_0', value: 0, label: '0' },
         { id: 'nps_1', value: 1, label: '1' },
         { id: 'nps_2', value: 2, label: '2' },
         { id: 'nps_3', value: 3, label: '3' },

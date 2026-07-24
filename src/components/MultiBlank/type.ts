@@ -8,6 +8,16 @@ export interface MultiBlankChangePayload {
   index?: number;
 }
 
+export interface MultiBlankSubmitValue {
+  questionId: string;
+  value: string[];
+}
+
+export interface MultiBlankRef {
+  init: (value?: string[]) => void;
+  getSubmitValue: () => MultiBlankSubmitValue;
+}
+
 export interface MultiBlankItem {
   label: React.ReactNode;
   placeholder?: string;
@@ -16,6 +26,7 @@ export interface MultiBlankItem {
 
 export interface MultiBlankProps {
   type?: MultiBlankType;
+  questionId: string;
   items: MultiBlankItem[];
   value?: string[];
   defaultValue?: string[];

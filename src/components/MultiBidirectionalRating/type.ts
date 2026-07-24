@@ -43,10 +43,25 @@ export interface MultiBidirectionalRatingChangePayload<
   value: MultiBidirectionalRatingAnswer<R>;
 }
 
+export interface MultiBidirectionalRatingSubmitValue<
+  R extends MultiBidirectionalRatingValue = MultiBidirectionalRatingValue,
+> {
+  questionId: string;
+  value: MultiBidirectionalRatingAnswer<R>;
+}
+
+export interface MultiBidirectionalRatingRef<
+  R extends MultiBidirectionalRatingValue = MultiBidirectionalRatingValue,
+> {
+  init: (value?: MultiBidirectionalRatingAnswer<R>) => void;
+  getSubmitValue: () => MultiBidirectionalRatingSubmitValue<R>;
+}
+
 export interface MultiBidirectionalRatingProps<
   R extends MultiBidirectionalRatingValue = MultiBidirectionalRatingValue,
 > {
   type?: MultiBidirectionalRatingType;
+  questionId: string;
   rows: Array<MultiBidirectionalRatingRow<R>>;
   columns: MultiBidirectionalRatingColumn[];
   value?: MultiBidirectionalRatingAnswer<R>;

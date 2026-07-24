@@ -14,7 +14,18 @@ export interface MultiChoiceChangePayload<T extends MultiChoiceValue = MultiChoi
   checked: boolean;
 }
 
+export interface MultiChoiceSubmitValue<T extends MultiChoiceValue = MultiChoiceValue> {
+  questionId: string;
+  value: T[];
+}
+
+export interface MultiChoiceRef<T extends MultiChoiceValue = MultiChoiceValue> {
+  init: (value?: T[]) => void;
+  getSubmitValue: () => MultiChoiceSubmitValue<T>;
+}
+
 export interface MultiChoiceProps<T extends MultiChoiceValue = MultiChoiceValue> {
+  questionId: string;
   options: Array<MultiChoiceOption<T>>;
   value?: T[];
   defaultValue?: T[];

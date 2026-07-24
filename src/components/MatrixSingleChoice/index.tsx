@@ -1,21 +1,24 @@
-import React, { useState } from 'react';
+import React, { useState, forwardRef, useImperativeHandle } from 'react';
 import { ScrollView, View } from '@tarojs/components';
 import type {
   MatrixSingleChoiceColumn,
   MatrixSingleChoiceProps,
+  MatrixSingleChoiceRef,
   MatrixSingleChoiceRow,
   MatrixSingleChoiceValue,
 } from './type';
 import { getRecordKey, getSingleAnswerValue, joinClassNames } from './util';
 import './style.less';
 
-const MatrixSingleChoice = <
+const MatrixSingleChoiceInner = <
   R extends MatrixSingleChoiceValue = MatrixSingleChoiceValue,
   C extends MatrixSingleChoiceValue = MatrixSingleChoiceValue,
 >(
   props: MatrixSingleChoiceProps<R, C>,
+  ref: React.ForwardedRef<MatrixSingleChoiceRef<R, C>>,
 ): React.ReactElement => {
   const {
+    questionId,
     rows,
     columns,
     value,
@@ -26,6 +29,18 @@ const MatrixSingleChoice = <
   } = props;
   const [innerValue, setInnerValue] = useState(defaultValue);
   const currentValue = value !== undefined ? value : innerValue;
+
+  useImperativeHandle(
+    ref,
+    () => ({
+      init: nextValue => setInnerValue(nextValue || {}),
+      getSubmitValue: () => ({
+        questionId,
+        value: currentValue,
+      }),
+    }),
+    [currentValue, questionId],
+  );
 
   const handleSelect = (
     row: MatrixSingleChoiceRow<R>,
@@ -58,10 +73,7 @@ const MatrixSingleChoice = <
           <View className="matrix-single-choice__row matrix-single-choice__head">
             <View className="matrix-single-choice__corner" />
             {columns.map(column => (
-              <View
-                key={getRecordKey(column.value)}
-                className="matrix-single-choice__column"
-              >
+              <View key={getRecordKey(column.value)} className="matrix-single-choice__column">
                 {column.label}
               </View>
             ))}
@@ -77,14 +89,11 @@ const MatrixSingleChoice = <
               <View className="matrix-single-choice__row-title">
                 <View>{row.label}</View>
                 {row.description && (
-                  <View className="matrix-single-choice__description">
-                    {row.description}
-                  </View>
+                  <View className="matrix-single-choice__description">{row.description}</View>
                 )}
               </View>
               {columns.map(column => {
-                const checked =
-                  getSingleAnswerValue(currentValue, row.value) === column.value;
+                const checked = getSingleAnswerValue(currentValue, row.value) === column.value;
                 const cellDisabled = disabled || row.disabled || column.disabled;
 
                 return (
@@ -103,9 +112,7 @@ const MatrixSingleChoice = <
                         checked && 'matrix-single-choice__radio--checked',
                       ])}
                     >
-                      {checked && (
-                        <View className="matrix-single-choice__radio-dot" />
-                      )}
+                      {checked && <View className="matrix-single-choice__radio-dot" />}
                     </View>
                   </View>
                 );
@@ -118,13 +125,22 @@ const MatrixSingleChoice = <
   );
 };
 
+const MatrixSingleChoice = forwardRef(MatrixSingleChoiceInner) as <
+  R extends MatrixSingleChoiceValue = MatrixSingleChoiceValue,
+  C extends MatrixSingleChoiceValue = MatrixSingleChoiceValue,
+>(
+  props: MatrixSingleChoiceProps<R, C> & React.RefAttributes<MatrixSingleChoiceRef<R, C>>,
+) => React.ReactElement;
+
 export default MatrixSingleChoice;
 export type {
   MatrixSingleChoiceAnswer,
   MatrixSingleChoiceChangePayload,
   MatrixSingleChoiceColumn,
   MatrixSingleChoiceProps,
+  MatrixSingleChoiceRef,
   MatrixSingleChoiceRow,
+  MatrixSingleChoiceSubmitValue,
   MatrixSingleChoiceType,
   MatrixSingleChoiceValue,
 } from './type';

@@ -17,8 +17,19 @@ export interface RatingChangePayload {
   value: RatingAnswer;
 }
 
+export interface RatingSubmitValue {
+  questionId: string;
+  value: RatingAnswer;
+}
+
+export interface RatingRef {
+  init: (value?: RatingAnswer) => void;
+  getSubmitValue: () => RatingSubmitValue;
+}
+
 export interface RatingProps {
   type?: RatingType;
+  questionId: string;
   options: RatingOption[];
   value?: RatingAnswer;
   defaultValue?: RatingAnswer;

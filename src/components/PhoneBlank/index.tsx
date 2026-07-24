@@ -1,16 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, forwardRef, useImperativeHandle } from 'react';
 import { Input, Text, View } from '@tarojs/components';
-import type { PhoneBlankProps } from './type';
-import {
-  getInputValue,
-  joinClassNames,
-  normalizePhoneValue,
-  validatePhoneValue,
-} from './util';
+import type { PhoneBlankProps, PhoneBlankRef } from './type';
+import { getInputValue, joinClassNames, normalizePhoneValue, validatePhoneValue } from './util';
 import './style.less';
 
-const PhoneBlank: React.FC<PhoneBlankProps> = props => {
+const PhoneBlank = forwardRef<PhoneBlankRef, PhoneBlankProps>((props, ref) => {
   const {
+    questionId,
     value,
     defaultValue = '',
     label,
@@ -30,8 +26,7 @@ const PhoneBlank: React.FC<PhoneBlankProps> = props => {
   const [error, setError] = useState('');
   const currentValue = value !== undefined ? value : innerValue;
   const validateValue = (nextValue: string): string =>
-    validate?.(nextValue) ||
-    validatePhoneValue(nextValue, required, requiredMessage, errorMessage);
+    validate?.(nextValue) || validatePhoneValue(nextValue, required, requiredMessage, errorMessage);
 
   const emitChange = (nextValue: string, nextError: string): void => {
     onChange?.(nextValue, {
@@ -40,6 +35,21 @@ const PhoneBlank: React.FC<PhoneBlankProps> = props => {
       error: nextError,
     });
   };
+
+  useImperativeHandle(
+    ref,
+    () => ({
+      init: nextValue => {
+        setInnerValue(nextValue || '');
+        setError('');
+      },
+      getSubmitValue: () => ({
+        questionId,
+        value: currentValue,
+      }),
+    }),
+    [currentValue, questionId],
+  );
 
   return (
     <View className={joinClassNames(['phone-blank', className])}>
@@ -86,11 +96,13 @@ const PhoneBlank: React.FC<PhoneBlankProps> = props => {
       {error && <Text className="phone-blank__error">{error}</Text>}
     </View>
   );
-};
+});
 
 export default PhoneBlank;
 export type {
   PhoneBlankChangePayload,
   PhoneBlankProps,
+  PhoneBlankRef,
+  PhoneBlankSubmitValue,
   PhoneBlankType,
 } from './type';

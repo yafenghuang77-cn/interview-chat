@@ -8,8 +8,19 @@ export interface TextBlankChangePayload {
   value: string;
 }
 
+export interface TextBlankSubmitValue {
+  questionId: string;
+  value: string;
+}
+
+export interface TextBlankRef {
+  init: (value?: string) => void;
+  getSubmitValue: () => TextBlankSubmitValue;
+}
+
 export interface TextBlankProps {
   type?: TextBlankType;
+  questionId: string;
   value?: string;
   defaultValue?: string;
   label?: React.ReactNode;

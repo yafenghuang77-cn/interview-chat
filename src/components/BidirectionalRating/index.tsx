@@ -1,116 +1,116 @@
-import React, { useState } from 'react';
+import React, { useState, useImperativeHandle, forwardRef } from 'react';
 import { ScrollView, View } from '@tarojs/components';
 import StarIcon from '../StarIcon';
 import type {
   BidirectionalRatingColumn,
   BidirectionalRatingProps,
+  BidirectionalRatingRef,
   BidirectionalRatingSide,
 } from './type';
-import {
-  getActiveScore,
-  getColumnKey,
-  getNextValue,
-  joinClassNames,
-} from './util';
+import { getActiveScore, getColumnKey, getNextValue, joinClassNames } from './util';
 import './style.less';
 
-const BidirectionalRating: React.FC<BidirectionalRatingProps> = props => {
-  const {
-    columns,
-    value,
-    defaultValue = null,
-    disabled = false,
-    leftLabel = '左侧',
-    rightLabel = '右侧',
-    className = '',
-    onChange,
-  } = props;
-  const [innerValue, setInnerValue] = useState(defaultValue);
-  const currentValue = value !== undefined ? value : innerValue;
+const BidirectionalRating = forwardRef<BidirectionalRatingRef, BidirectionalRatingProps>(
+  (props, ref) => {
+    const {
+      questionId,
+      columns,
+      value,
+      defaultValue = null,
+      disabled = false,
+      leftLabel = '左侧',
+      rightLabel = '右侧',
+      className = '',
+      onChange,
+    } = props;
+    const [innerValue, setInnerValue] = useState(defaultValue);
+    const currentValue = value !== undefined ? value : innerValue;
 
-  const handleRate = (
-    side: BidirectionalRatingSide,
-    column: BidirectionalRatingColumn,
-  ): void => {
-    const cellDisabled = disabled || column.disabled;
+    useImperativeHandle(
+      ref,
+      () => ({
+        init: nextValue => setInnerValue(nextValue || null),
+        getSubmitValue: () => ({
+          questionId,
+          value: currentValue,
+        }),
+      }),
+      [currentValue, questionId],
+    );
 
-    if (cellDisabled) {
-      return;
-    }
+    const handleRate = (side: BidirectionalRatingSide, column: BidirectionalRatingColumn): void => {
+      const cellDisabled = disabled || column.disabled;
 
-    const nextValue = getNextValue(currentValue, side, column.value);
+      if (cellDisabled) {
+        return;
+      }
 
-    if (value === undefined) {
-      setInnerValue(nextValue);
-    }
+      const nextValue = getNextValue(currentValue, side, column.value);
 
-    onChange?.(nextValue, {
-      side,
-      score: column.value,
-      value: nextValue,
-    });
-  };
+      if (value === undefined) {
+        setInnerValue(nextValue);
+      }
 
-  const renderStars = (side: BidirectionalRatingSide) => {
-    const activeScore = getActiveScore(currentValue, side);
+      onChange?.(nextValue, {
+        side,
+        score: column.value,
+        value: nextValue,
+      });
+    };
+
+    const renderStars = (side: BidirectionalRatingSide) => {
+      const activeScore = getActiveScore(currentValue, side);
+
+      return (
+        <View className="bidirectional-rating__scale">
+          {columns.map(column => {
+            const checked = column.value <= activeScore;
+            const cellDisabled = disabled || column.disabled;
+
+            return (
+              <View
+                key={getColumnKey(column.value)}
+                className={joinClassNames([
+                  'bidirectional-rating__option',
+                  checked && 'bidirectional-rating__option--checked',
+                  cellDisabled && 'bidirectional-rating__option--disabled',
+                ])}
+                onClick={() => handleRate(side, column)}
+              >
+                <View className="bidirectional-rating__star">
+                  <StarIcon active={checked} disabled={cellDisabled} size={38} />
+                </View>
+                <View className="bidirectional-rating__option-label">{column.label}</View>
+                {column.description && (
+                  <View className="bidirectional-rating__option-tip">{column.description}</View>
+                )}
+              </View>
+            );
+          })}
+        </View>
+      );
+    };
 
     return (
-      <View className="bidirectional-rating__scale">
-        {columns.map(column => {
-          const checked = column.value <= activeScore;
-          const cellDisabled = disabled || column.disabled;
-
-          return (
-            <View
-              key={getColumnKey(column.value)}
-              className={joinClassNames([
-                'bidirectional-rating__option',
-                checked && 'bidirectional-rating__option--checked',
-                cellDisabled && 'bidirectional-rating__option--disabled',
-              ])}
-              onClick={() => handleRate(side, column)}
-            >
-              <View className="bidirectional-rating__star">
-                <StarIcon
-                  active={checked}
-                  disabled={cellDisabled}
-                  size={38}
-                />
+      <View className={joinClassNames(['bidirectional-rating', className])}>
+        <View className="bidirectional-rating__panel">
+          <ScrollView className="bidirectional-rating__scroll" scrollX>
+            <View className="bidirectional-rating__content">
+              <View className="bidirectional-rating__side">
+                <View className="bidirectional-rating__label">{leftLabel}</View>
+                {renderStars('left')}
               </View>
-              <View className="bidirectional-rating__option-label">
-                {column.label}
+              <View className="bidirectional-rating__side">
+                <View className="bidirectional-rating__label">{rightLabel}</View>
+                {renderStars('right')}
               </View>
-              {column.description && (
-                <View className="bidirectional-rating__option-tip">
-                  {column.description}
-                </View>
-              )}
             </View>
-          );
-        })}
+          </ScrollView>
+        </View>
       </View>
     );
-  };
-
-  return (
-    <View className={joinClassNames(['bidirectional-rating', className])}>
-      <View className="bidirectional-rating__panel">
-        <ScrollView className="bidirectional-rating__scroll" scrollX>
-          <View className="bidirectional-rating__content">
-            <View className="bidirectional-rating__side">
-              <View className="bidirectional-rating__label">{leftLabel}</View>
-              {renderStars('left')}
-            </View>
-            <View className="bidirectional-rating__side">
-              <View className="bidirectional-rating__label">{rightLabel}</View>
-              {renderStars('right')}
-            </View>
-          </View>
-        </ScrollView>
-      </View>
-    </View>
-  );
-};
+  },
+);
 
 export default BidirectionalRating;
 export type {
@@ -118,6 +118,8 @@ export type {
   BidirectionalRatingChangePayload,
   BidirectionalRatingColumn,
   BidirectionalRatingProps,
+  BidirectionalRatingRef,
   BidirectionalRatingSide,
+  BidirectionalRatingSubmitValue,
   BidirectionalRatingType,
 } from './type';

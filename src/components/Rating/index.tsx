@@ -1,12 +1,13 @@
-import React, { useState } from 'react';
+import React, { useState, forwardRef, useImperativeHandle } from 'react';
 import { ScrollView, View } from '@tarojs/components';
 import StarIcon from '../StarIcon';
-import type { RatingOption, RatingProps } from './type';
+import type { RatingOption, RatingProps, RatingRef } from './type';
 import { getOptionKey, getRatingValue, joinClassNames } from './util';
 import './style.less';
 
-const Rating: React.FC<RatingProps> = props => {
+const Rating = forwardRef<RatingRef, RatingProps>((props, ref) => {
   const {
+    questionId,
     options,
     value,
     defaultValue = null,
@@ -17,6 +18,18 @@ const Rating: React.FC<RatingProps> = props => {
   const [innerValue, setInnerValue] = useState(defaultValue);
   const currentValue = value !== undefined ? value : innerValue;
   const selectedScore = getRatingValue(currentValue);
+
+  useImperativeHandle(
+    ref,
+    () => ({
+      init: nextValue => setInnerValue(nextValue ?? null),
+      getSubmitValue: () => ({
+        questionId,
+        value: currentValue,
+      }),
+    }),
+    [currentValue, questionId],
+  );
 
   const handleSelect = (option: RatingOption): void => {
     const optionDisabled = disabled || option.disabled;
@@ -55,17 +68,11 @@ const Rating: React.FC<RatingProps> = props => {
                   onClick={() => handleSelect(option)}
                 >
                   <View className="rating__star">
-                    <StarIcon
-                      active={checked}
-                      disabled={optionDisabled}
-                      size={38}
-                    />
+                    <StarIcon active={checked} disabled={optionDisabled} size={38} />
                   </View>
                   <View className="rating__label">{option.label}</View>
                   {option.description && (
-                    <View className="rating__description">
-                      {option.description}
-                    </View>
+                    <View className="rating__description">{option.description}</View>
                   )}
                 </View>
               );
@@ -75,7 +82,7 @@ const Rating: React.FC<RatingProps> = props => {
       </View>
     </View>
   );
-};
+});
 
 export default Rating;
 export type {
@@ -83,5 +90,7 @@ export type {
   RatingChangePayload,
   RatingOption,
   RatingProps,
+  RatingRef,
+  RatingSubmitValue,
   RatingType,
 } from './type';

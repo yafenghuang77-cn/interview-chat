@@ -17,8 +17,19 @@ export interface NpsRatingChangePayload {
   value: NpsRatingAnswer;
 }
 
+export interface NpsRatingSubmitValue {
+  questionId: string;
+  value: NpsRatingAnswer;
+}
+
+export interface NpsRatingRef {
+  init: (value?: NpsRatingAnswer) => void;
+  getSubmitValue: () => NpsRatingSubmitValue;
+}
+
 export interface NpsRatingProps {
   type?: NpsRatingType;
+  questionId: string;
   options: NpsRatingOption[];
   value?: NpsRatingAnswer;
   defaultValue?: NpsRatingAnswer;
@@ -26,8 +37,5 @@ export interface NpsRatingProps {
   lowLabel?: React.ReactNode;
   highLabel?: React.ReactNode;
   className?: string;
-  onChange?: (
-    value: NpsRatingAnswer,
-    payload: NpsRatingChangePayload,
-  ) => void;
+  onChange?: (value: NpsRatingAnswer, payload: NpsRatingChangePayload) => void;
 }

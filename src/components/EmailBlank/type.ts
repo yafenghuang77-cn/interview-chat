@@ -9,8 +9,19 @@ export interface EmailBlankChangePayload {
   error: string;
 }
 
+export interface EmailBlankSubmitValue {
+  questionId: string;
+  value: string;
+}
+
+export interface EmailBlankRef {
+  init: (value?: string) => void;
+  getSubmitValue: () => EmailBlankSubmitValue;
+}
+
 export interface EmailBlankProps {
   type?: EmailBlankType;
+  questionId: string;
   value?: string;
   defaultValue?: string;
   label?: React.ReactNode;

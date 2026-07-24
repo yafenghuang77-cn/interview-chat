@@ -141,6 +141,44 @@ import {
 import { MultipleChoice, ImageMultipleChoice } from '@/components';
 ```
 
+## 通用 Ref 方法
+
+所有题目组件都需要传入 `questionId`。组件通过 `forwardRef` 暴露两个方法，方便父级统一做编辑回显和提交取值：
+
+| 方法 | 说明 |
+| --- | --- |
+| `init(value)` | 初始化组件内部值，用于编辑状态回显 |
+| `getSubmitValue()` | 获取提交值，返回 `{ questionId, value }` |
+
+```tsx
+import React, { useRef } from 'react';
+import { SingleChoice, type SingleChoiceRef } from '@/components';
+
+const Demo = () => {
+  const choiceRef = useRef<SingleChoiceRef<string>>(null);
+
+  const echoEditValue = () => {
+    choiceRef.current?.init('a');
+  };
+
+  const collectValue = () => {
+    const submitValue = choiceRef.current?.getSubmitValue();
+    // submitValue: { questionId: 'question_001', value: 'a' }
+  };
+
+  return (
+    <SingleChoice
+      ref={choiceRef}
+      questionId="question_001"
+      options={[
+        { label: '选项 A', value: 'a' },
+        { label: '选项 B', value: 'b' },
+      ]}
+    />
+  );
+};
+```
+
 ## 文字单选
 
 ```tsx
@@ -158,6 +196,7 @@ const Demo = () => {
 
   return (
     <SingleChoice
+      questionId="single_choice_001"
       options={options}
       value={value}
       onChange={nextValue => setValue(nextValue)}
@@ -170,6 +209,7 @@ const Demo = () => {
 
 | 属性 | 类型 | 说明 |
 | --- | --- | --- |
+| `questionId` | `string` | 题目 ID，会随 `getSubmitValue()` 返回 |
 | `options` | `SingleChoiceOption<T>[]` | 选项列表 |
 | `value` | `T \| null` | 当前选中值，传入后为受控模式 |
 | `defaultValue` | `T \| null` | 默认选中值，非受控模式使用 |
@@ -204,6 +244,7 @@ const Demo = () => {
 
   return (
     <MultiChoice
+      questionId="multi_choice_001"
       options={options}
       value={value}
       onChange={nextValue => setValue(nextValue)}
@@ -216,6 +257,7 @@ const Demo = () => {
 
 | 属性 | 类型 | 说明 |
 | --- | --- | --- |
+| `questionId` | `string` | 题目 ID，会随 `getSubmitValue()` 返回 |
 | `options` | `MultiChoiceOption<T>[]` | 选项列表 |
 | `value` | `T[]` | 当前选中值数组，传入后为受控模式 |
 | `defaultValue` | `T[]` | 默认选中值数组，非受控模式使用 |
@@ -252,6 +294,7 @@ const Demo = () => {
 
   return (
     <ImageSingleChoice
+      questionId="image_single_choice_001"
       options={options}
       value={value}
       onChange={nextValue => setValue(nextValue)}
@@ -264,6 +307,7 @@ const Demo = () => {
 
 | 属性 | 类型 | 说明 |
 | --- | --- | --- |
+| `questionId` | `string` | 题目 ID，会随 `getSubmitValue()` 返回 |
 | `options` | `ImageSingleChoiceOption<T>[]` | 图片选项列表 |
 | `value` | `T \| null` | 当前选中值，传入后为受控模式 |
 | `defaultValue` | `T \| null` | 默认选中值，非受控模式使用 |
@@ -308,6 +352,7 @@ const Demo = () => {
 
   return (
     <ImageMultiChoice
+      questionId="image_multi_choice_001"
       options={options}
       value={value}
       onChange={nextValue => setValue(nextValue)}
@@ -320,6 +365,7 @@ const Demo = () => {
 
 | 属性 | 类型 | 说明 |
 | --- | --- | --- |
+| `questionId` | `string` | 题目 ID，会随 `getSubmitValue()` 返回 |
 | `options` | `ImageMultiChoiceOption<T>[]` | 图片选项列表 |
 | `value` | `T[]` | 当前选中值数组，传入后为受控模式 |
 | `defaultValue` | `T[]` | 默认选中值数组，非受控模式使用 |
@@ -364,6 +410,7 @@ const Demo = () => {
   return (
     <PhoneBlank
       type={QUESTION_COMPONENT_TYPE.PHONE_BLANK}
+      questionId="phone_blank_001"
       label="手机号"
       value={value}
       onChange={nextValue => setValue(nextValue)}
@@ -377,6 +424,7 @@ const Demo = () => {
 | 属性 | 类型 | 说明 |
 | --- | --- | --- |
 | `type` | 对应组件类型常量 | 组件类型 |
+| `questionId` | `string` | 题目 ID，会随 `getSubmitValue()` 返回 |
 | `value` | `string` | 当前输入值，传入后为受控模式 |
 | `defaultValue` | `string` | 默认输入值，非受控模式使用 |
 | `label` | `React.ReactNode` | 输入框上方标题 |
@@ -408,6 +456,7 @@ const Demo = () => {
 
   return (
     <DateBlank
+      questionId="date_blank_001"
       label="日期"
       value={value}
       mode="datetime"
@@ -420,6 +469,7 @@ const Demo = () => {
 | 属性 | 类型 | 说明 |
 | --- | --- | --- |
 | `type` | `QUESTION_COMPONENT_TYPE.DATE_BLANK` | 组件类型 |
+| `questionId` | `string` | 题目 ID，会随 `getSubmitValue()` 返回 |
 | `mode` | `date \| datetime` | 选择模式，默认 `datetime` |
 | `value` | `string \| null` | 当前日期，传入后为受控模式 |
 | `defaultValue` | `string \| null` | 默认日期，非受控模式使用 |
@@ -444,6 +494,7 @@ const Demo = () => {
 import { ImageDisplay, VideoDisplay } from '@/components';
 
 <ImageDisplay
+  questionId="image_display_001"
   images={[
     { src: 'https://example.com/a.png', title: '图片 A' },
     { src: 'https://example.com/b.png', title: '图片 B' },
@@ -451,6 +502,7 @@ import { ImageDisplay, VideoDisplay } from '@/components';
 />
 
 <VideoDisplay
+  questionId="video_display_001"
   videos={[
     { src: 'https://example.com/a.mp4', title: '视频 A' },
     { src: 'https://example.com/b.mp4', title: '视频 B' },
@@ -487,9 +539,18 @@ const columns = [
   { value: 'good', label: '满意' },
 ];
 
-<MatrixSingleChoice rows={rows} columns={columns} />
-<MatrixMultiChoice rows={rows} columns={columns} />
+<MatrixSingleChoice
+  questionId="matrix_single_choice_001"
+  rows={rows}
+  columns={columns}
+/>
+<MatrixMultiChoice
+  questionId="matrix_multi_choice_001"
+  rows={rows}
+  columns={columns}
+/>
 <MatrixRating
+  questionId="matrix_rating_001"
   rows={rows}
   columns={[
     { value: 1, label: '1分 完全不认可' },
@@ -500,6 +561,7 @@ const columns = [
   ]}
 />
 <MatrixBidirectionalRating
+  questionId="matrix_bidirectional_rating_001"
   rows={rows}
   columns={[
     { value: 1, label: '1星 轻微偏向' },
@@ -532,6 +594,7 @@ const Demo = () => {
 
   return (
     <MultiBlank
+      questionId="multi_blank_001"
       label="多项填空"
       items={[
         { label: '姓名', placeholder: '请输入姓名' },
@@ -547,6 +610,7 @@ const Demo = () => {
 | 属性 | 类型 | 说明 |
 | --- | --- | --- |
 | `type` | `QUESTION_COMPONENT_TYPE.MULTI_BLANK` | 组件类型 |
+| `questionId` | `string` | 题目 ID，会随 `getSubmitValue()` 返回 |
 | `items` | `MultiBlankItem[]` | 固定填空项列表，每项包含文案和输入框配置 |
 | `value` | `string[]` | 当前输入值数组，传入后为受控模式 |
 | `defaultValue` | `string[]` | 默认输入值数组，非受控模式使用 |
@@ -565,6 +629,7 @@ const Demo = () => {
 
 ```tsx
 <SingleChoice
+  questionId="single_choice_001"
   className="answer-choice"
   optionClassName="answer-choice__item"
   options={options}

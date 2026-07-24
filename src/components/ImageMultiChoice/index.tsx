@@ -1,13 +1,15 @@
-import React, { useState } from 'react';
+import React, { useState, useImperativeHandle, forwardRef } from 'react';
 import { Image, Text, View } from '@tarojs/components';
-import type { ImageMultiChoiceOption, ImageMultiChoiceProps } from './type';
+import type { ImageMultiChoiceOption, ImageMultiChoiceProps, ImageMultiChoiceRef } from './type';
 import { joinClassNames } from './util';
 import './style.less';
 
-const ImageMultiChoice = <T extends string | number = string | number>(
+const ImageMultiChoiceInner = <T extends string | number = string | number>(
   props: ImageMultiChoiceProps<T>,
+  ref: React.ForwardedRef<ImageMultiChoiceRef<T>>,
 ): React.ReactElement => {
   const {
+    questionId,
     options,
     value,
     defaultValue = [],
@@ -18,6 +20,18 @@ const ImageMultiChoice = <T extends string | number = string | number>(
   } = props;
   const [innerValue, setInnerValue] = useState<T[]>(defaultValue);
   const selectedValue = value !== undefined ? value : innerValue;
+
+  useImperativeHandle(
+    ref,
+    () => ({
+      init: nextValue => setInnerValue(nextValue || []),
+      getSubmitValue: () => ({
+        questionId,
+        value: selectedValue,
+      }),
+    }),
+    [questionId, selectedValue],
+  );
 
   const handleToggle = (option: ImageMultiChoiceOption<T>): void => {
     const optionDisabled = disabled || option.disabled;
@@ -76,13 +90,9 @@ const ImageMultiChoice = <T extends string | number = string | number>(
               </View>
 
               <View className="image-multi-choice__content">
-                <View className="image-multi-choice__label">
-                  {option.label}
-                </View>
+                <View className="image-multi-choice__label">{option.label}</View>
                 {option.description && (
-                  <View className="image-multi-choice__description">
-                    {option.description}
-                  </View>
+                  <View className="image-multi-choice__description">{option.description}</View>
                 )}
               </View>
             </View>
@@ -93,10 +103,18 @@ const ImageMultiChoice = <T extends string | number = string | number>(
   );
 };
 
+const ImageMultiChoice = forwardRef(ImageMultiChoiceInner) as <
+  T extends string | number = string | number,
+>(
+  props: ImageMultiChoiceProps<T> & React.RefAttributes<ImageMultiChoiceRef<T>>,
+) => React.ReactElement;
+
 export default ImageMultiChoice;
 export type {
   ImageMultiChoiceChangePayload,
   ImageMultiChoiceOption,
   ImageMultiChoiceProps,
+  ImageMultiChoiceRef,
+  ImageMultiChoiceSubmitValue,
   ImageMultiChoiceValue,
 } from './type';

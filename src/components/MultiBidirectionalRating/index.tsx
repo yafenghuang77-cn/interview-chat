@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, forwardRef, useImperativeHandle } from 'react';
 import { ScrollView, View } from '@tarojs/components';
 import StarIcon from '../StarIcon';
 import type {
   MultiBidirectionalRatingColumn,
   MultiBidirectionalRatingProps,
+  MultiBidirectionalRatingRef,
   MultiBidirectionalRatingRow,
   MultiBidirectionalRatingSide,
   MultiBidirectionalRatingValue,
@@ -17,12 +18,14 @@ import {
 } from './util';
 import './style.less';
 
-const MultiBidirectionalRating = <
+const MultiBidirectionalRatingInner = <
   R extends MultiBidirectionalRatingValue = MultiBidirectionalRatingValue,
 >(
   props: MultiBidirectionalRatingProps<R>,
+  ref: React.ForwardedRef<MultiBidirectionalRatingRef<R>>,
 ): React.ReactElement => {
   const {
+    questionId,
     rows,
     columns,
     value,
@@ -35,6 +38,18 @@ const MultiBidirectionalRating = <
   } = props;
   const [innerValue, setInnerValue] = useState(defaultValue);
   const currentValue = value !== undefined ? value : innerValue;
+
+  useImperativeHandle(
+    ref,
+    () => ({
+      init: nextValue => setInnerValue(nextValue || {}),
+      getSubmitValue: () => ({
+        questionId,
+        value: currentValue,
+      }),
+    }),
+    [currentValue, questionId],
+  );
 
   const handleRate = (
     row: MultiBidirectionalRatingRow<R>,
@@ -50,11 +65,7 @@ const MultiBidirectionalRating = <
     const currentRowValue = getBidirectionalRatingValue(currentValue, row.value);
     const nextValue = {
       ...currentValue,
-      [getRecordKey(row.value)]: getNextRatingValue(
-        currentRowValue,
-        side,
-        column.value,
-      ),
+      [getRecordKey(row.value)]: getNextRatingValue(currentRowValue, side, column.value),
     };
 
     if (value === undefined) {
@@ -94,19 +105,11 @@ const MultiBidirectionalRating = <
               onClick={() => handleRate(row, side, column)}
             >
               <View className="multi-bidirectional-rating__star">
-                <StarIcon
-                  active={checked}
-                  disabled={cellDisabled}
-                  size={38}
-                />
+                <StarIcon active={checked} disabled={cellDisabled} size={38} />
               </View>
-              <View className="multi-bidirectional-rating__option-label">
-                {column.label}
-              </View>
+              <View className="multi-bidirectional-rating__option-label">{column.label}</View>
               {column.description && (
-                <View className="multi-bidirectional-rating__option-tip">
-                  {column.description}
-                </View>
+                <View className="multi-bidirectional-rating__option-tip">{column.description}</View>
               )}
             </View>
           );
@@ -131,15 +134,10 @@ const MultiBidirectionalRating = <
             <View className="multi-bidirectional-rating__title">
               <View>{row.label}</View>
               {row.description && (
-                <View className="multi-bidirectional-rating__description">
-                  {row.description}
-                </View>
+                <View className="multi-bidirectional-rating__description">{row.description}</View>
               )}
             </View>
-            <ScrollView
-              className="multi-bidirectional-rating__scroll"
-              scrollX
-            >
+            <ScrollView className="multi-bidirectional-rating__scroll" scrollX>
               <View className="multi-bidirectional-rating__content">
                 <View className="multi-bidirectional-rating__side">
                   <View className="multi-bidirectional-rating__label">
@@ -162,15 +160,23 @@ const MultiBidirectionalRating = <
   );
 };
 
+const MultiBidirectionalRating = forwardRef(MultiBidirectionalRatingInner) as <
+  R extends MultiBidirectionalRatingValue = MultiBidirectionalRatingValue,
+>(
+  props: MultiBidirectionalRatingProps<R> & React.RefAttributes<MultiBidirectionalRatingRef<R>>,
+) => React.ReactElement;
+
 export default MultiBidirectionalRating;
 export type {
   MultiBidirectionalRatingAnswer,
   MultiBidirectionalRatingChangePayload,
   MultiBidirectionalRatingColumn,
   MultiBidirectionalRatingProps,
+  MultiBidirectionalRatingRef,
   MultiBidirectionalRatingRow,
   MultiBidirectionalRatingScore,
   MultiBidirectionalRatingSide,
+  MultiBidirectionalRatingSubmitValue,
   MultiBidirectionalRatingType,
   MultiBidirectionalRatingValue,
 } from './type';

@@ -1,11 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, forwardRef, useImperativeHandle } from 'react';
 import { Input, View } from '@tarojs/components';
-import type { MultiBlankProps } from './type';
+import type { MultiBlankProps, MultiBlankRef } from './type';
 import { createBlankItems, getInputValue, joinClassNames } from './util';
 import './style.less';
 
-const MultiBlank: React.FC<MultiBlankProps> = props => {
+const MultiBlank = forwardRef<MultiBlankRef, MultiBlankProps>((props, ref) => {
   const {
+    questionId,
     items,
     value,
     defaultValue,
@@ -19,11 +20,20 @@ const MultiBlank: React.FC<MultiBlankProps> = props => {
     onChange,
   } = props;
   const [focusedIndex, setFocusedIndex] = useState<number | null>(null);
-  const [innerValue, setInnerValue] = useState(() =>
-    createBlankItems(defaultValue, items.length),
+  const [innerValue, setInnerValue] = useState(() => createBlankItems(defaultValue, items.length));
+  const currentValue = value !== undefined ? createBlankItems(value, items.length) : innerValue;
+
+  useImperativeHandle(
+    ref,
+    () => ({
+      init: nextValue => setInnerValue(createBlankItems(nextValue, items.length)),
+      getSubmitValue: () => ({
+        questionId,
+        value: currentValue,
+      }),
+    }),
+    [currentValue, items.length, questionId],
   );
-  const currentValue =
-    value !== undefined ? createBlankItems(value, items.length) : innerValue;
 
   const commitValue = (nextValue: string[], index?: number): void => {
     if (value === undefined) {
@@ -54,10 +64,7 @@ const MultiBlank: React.FC<MultiBlankProps> = props => {
                 ])}
               >
                 <Input
-                  className={joinClassNames([
-                    'multi-blank__input',
-                    inputClassName,
-                  ])}
+                  className={joinClassNames(['multi-blank__input', inputClassName])}
                   value={currentValue[index] || ''}
                   type="text"
                   disabled={itemDisabled}
@@ -82,12 +89,14 @@ const MultiBlank: React.FC<MultiBlankProps> = props => {
       </View>
     </View>
   );
-};
+});
 
 export default MultiBlank;
 export type {
   MultiBlankChangePayload,
   MultiBlankItem,
   MultiBlankProps,
+  MultiBlankRef,
+  MultiBlankSubmitValue,
   MultiBlankType,
 } from './type';

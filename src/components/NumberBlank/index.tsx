@@ -1,11 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, forwardRef, useImperativeHandle } from 'react';
 import { Input, Text, View } from '@tarojs/components';
-import type { NumberBlankProps } from './type';
+import type { NumberBlankProps, NumberBlankRef } from './type';
 import { getInputValue, joinClassNames, validateNumberValue } from './util';
 import './style.less';
 
-const NumberBlank: React.FC<NumberBlankProps> = props => {
+const NumberBlank = forwardRef<NumberBlankRef, NumberBlankProps>((props, ref) => {
   const {
+    questionId,
     value,
     defaultValue = '',
     label,
@@ -49,6 +50,21 @@ const NumberBlank: React.FC<NumberBlankProps> = props => {
       error: nextError,
     });
   };
+
+  useImperativeHandle(
+    ref,
+    () => ({
+      init: nextValue => {
+        setInnerValue(nextValue || '');
+        setError('');
+      },
+      getSubmitValue: () => ({
+        questionId,
+        value: currentValue,
+      }),
+    }),
+    [currentValue, questionId],
+  );
 
   return (
     <View className={joinClassNames(['number-blank', className])}>
@@ -95,11 +111,13 @@ const NumberBlank: React.FC<NumberBlankProps> = props => {
       {error && <Text className="number-blank__error">{error}</Text>}
     </View>
   );
-};
+});
 
 export default NumberBlank;
 export type {
   NumberBlankChangePayload,
   NumberBlankProps,
+  NumberBlankRef,
+  NumberBlankSubmitValue,
   NumberBlankType,
 } from './type';

@@ -1,12 +1,13 @@
-import React, { useState } from 'react';
+import React, { useState, forwardRef, useImperativeHandle } from 'react';
 import { ScrollView, View } from '@tarojs/components';
 import HeartIcon from '../HeartIcon';
-import type { NpsRatingOption, NpsRatingProps } from './type';
+import type { NpsRatingOption, NpsRatingProps, NpsRatingRef } from './type';
 import { getOptionKey, isHeartActive, joinClassNames } from './util';
 import './style.less';
 
-const NpsRating: React.FC<NpsRatingProps> = props => {
+const NpsRating = forwardRef<NpsRatingRef, NpsRatingProps>((props, ref) => {
   const {
+    questionId,
     options,
     value,
     defaultValue = null,
@@ -18,6 +19,18 @@ const NpsRating: React.FC<NpsRatingProps> = props => {
   } = props;
   const [innerValue, setInnerValue] = useState(defaultValue);
   const currentValue = value !== undefined ? value : innerValue;
+
+  useImperativeHandle(
+    ref,
+    () => ({
+      init: nextValue => setInnerValue(nextValue ?? null),
+      getSubmitValue: () => ({
+        questionId,
+        value: currentValue,
+      }),
+    }),
+    [currentValue, questionId],
+  );
 
   const handleSelect = (option: NpsRatingOption): void => {
     const optionDisabled = disabled || option.disabled;
@@ -56,17 +69,11 @@ const NpsRating: React.FC<NpsRatingProps> = props => {
                   onClick={() => handleSelect(option)}
                 >
                   <View className="nps-rating__heart">
-                    <HeartIcon
-                      active={checked}
-                      disabled={optionDisabled}
-                      size={36}
-                    />
+                    <HeartIcon active={checked} disabled={optionDisabled} size={36} />
                   </View>
                   <View className="nps-rating__value">{option.label}</View>
                   {option.description && (
-                    <View className="nps-rating__description">
-                      {option.description}
-                    </View>
+                    <View className="nps-rating__description">{option.description}</View>
                   )}
                 </View>
               );
@@ -76,15 +83,13 @@ const NpsRating: React.FC<NpsRatingProps> = props => {
         {(lowLabel || highLabel) && (
           <View className="nps-rating__labels">
             <View className="nps-rating__label">{lowLabel}</View>
-            <View className="nps-rating__label nps-rating__label--right">
-              {highLabel}
-            </View>
+            <View className="nps-rating__label nps-rating__label--right">{highLabel}</View>
           </View>
         )}
       </View>
     </View>
   );
-};
+});
 
 export default NpsRating;
 export type {
@@ -92,5 +97,7 @@ export type {
   NpsRatingChangePayload,
   NpsRatingOption,
   NpsRatingProps,
+  NpsRatingRef,
+  NpsRatingSubmitValue,
   NpsRatingType,
 } from './type';

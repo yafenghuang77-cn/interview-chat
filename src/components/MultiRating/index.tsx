@@ -1,21 +1,22 @@
-import React, { useState } from 'react';
+import React, { useState, forwardRef, useImperativeHandle } from 'react';
 import { ScrollView, View } from '@tarojs/components';
 import StarIcon from '../StarIcon';
 import type {
   MultiRatingColumn,
   MultiRatingProps,
+  MultiRatingRef,
   MultiRatingRow,
   MultiRatingValue,
 } from './type';
 import { getRatingValue, getRecordKey, joinClassNames } from './util';
 import './style.less';
 
-const MultiRating = <
-  R extends MultiRatingValue = MultiRatingValue,
->(
+const MultiRatingInner = <R extends MultiRatingValue = MultiRatingValue>(
   props: MultiRatingProps<R>,
+  ref: React.ForwardedRef<MultiRatingRef<R>>,
 ): React.ReactElement => {
   const {
+    questionId,
     rows,
     columns,
     value,
@@ -27,10 +28,19 @@ const MultiRating = <
   const [innerValue, setInnerValue] = useState(defaultValue);
   const currentValue = value !== undefined ? value : innerValue;
 
-  const handleRate = (
-    row: MultiRatingRow<R>,
-    column: MultiRatingColumn,
-  ): void => {
+  useImperativeHandle(
+    ref,
+    () => ({
+      init: nextValue => setInnerValue(nextValue || {}),
+      getSubmitValue: () => ({
+        questionId,
+        value: currentValue,
+      }),
+    }),
+    [currentValue, questionId],
+  );
+
+  const handleRate = (row: MultiRatingRow<R>, column: MultiRatingColumn): void => {
     const cellDisabled = disabled || row.disabled || column.disabled;
 
     if (cellDisabled) {
@@ -70,9 +80,7 @@ const MultiRating = <
             <View className="multi-rating__title">
               <View>{row.label}</View>
               {row.description && (
-                <View className="multi-rating__description">
-                  {row.description}
-                </View>
+                <View className="multi-rating__description">{row.description}</View>
               )}
             </View>
             <ScrollView className="multi-rating__scroll" scrollX>
@@ -92,19 +100,11 @@ const MultiRating = <
                       onClick={() => handleRate(row, column)}
                     >
                       <View className="multi-rating__star">
-                        <StarIcon
-                          active={checked}
-                          disabled={cellDisabled}
-                          size={38}
-                        />
+                        <StarIcon active={checked} disabled={cellDisabled} size={38} />
                       </View>
-                      <View className="multi-rating__label">
-                        {column.label}
-                      </View>
+                      <View className="multi-rating__label">{column.label}</View>
                       {column.description && (
-                        <View className="multi-rating__column-tip">
-                          {column.description}
-                        </View>
+                        <View className="multi-rating__column-tip">{column.description}</View>
                       )}
                     </View>
                   );
@@ -118,13 +118,19 @@ const MultiRating = <
   );
 };
 
+const MultiRating = forwardRef(MultiRatingInner) as <R extends MultiRatingValue = MultiRatingValue>(
+  props: MultiRatingProps<R> & React.RefAttributes<MultiRatingRef<R>>,
+) => React.ReactElement;
+
 export default MultiRating;
 export type {
   MultiRatingAnswer,
   MultiRatingChangePayload,
   MultiRatingColumn,
   MultiRatingProps,
+  MultiRatingRef,
   MultiRatingRow,
+  MultiRatingSubmitValue,
   MultiRatingType,
   MultiRatingValue,
 } from './type';

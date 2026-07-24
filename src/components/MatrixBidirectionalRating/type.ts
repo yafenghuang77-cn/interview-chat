@@ -43,10 +43,25 @@ export interface MatrixBidirectionalRatingChangePayload<
   value: MatrixBidirectionalRatingAnswer<R>;
 }
 
+export interface MatrixBidirectionalRatingSubmitValue<
+  R extends MatrixBidirectionalRatingValue = MatrixBidirectionalRatingValue,
+> {
+  questionId: string;
+  value: MatrixBidirectionalRatingAnswer<R>;
+}
+
+export interface MatrixBidirectionalRatingRef<
+  R extends MatrixBidirectionalRatingValue = MatrixBidirectionalRatingValue,
+> {
+  init: (value?: MatrixBidirectionalRatingAnswer<R>) => void;
+  getSubmitValue: () => MatrixBidirectionalRatingSubmitValue<R>;
+}
+
 export interface MatrixBidirectionalRatingProps<
   R extends MatrixBidirectionalRatingValue = MatrixBidirectionalRatingValue,
 > {
   type?: MatrixBidirectionalRatingType;
+  questionId: string;
   rows: Array<MatrixBidirectionalRatingRow<R>>;
   columns: MatrixBidirectionalRatingColumn[];
   value?: MatrixBidirectionalRatingAnswer<R>;

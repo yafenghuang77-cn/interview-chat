@@ -10,8 +10,19 @@ export interface VideoDisplayVideo {
   poster?: string;
 }
 
+export interface VideoDisplaySubmitValue {
+  questionId: string;
+  value: VideoDisplayVideo[];
+}
+
+export interface VideoDisplayRef {
+  init: (value?: VideoDisplayVideo[]) => void;
+  getSubmitValue: () => VideoDisplaySubmitValue;
+}
+
 export interface VideoDisplayProps {
   type?: VideoDisplayType;
+  questionId: string;
   videos?: VideoDisplayVideo[];
   src?: string;
   title?: React.ReactNode;

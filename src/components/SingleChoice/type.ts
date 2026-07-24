@@ -14,7 +14,18 @@ export interface SingleChoiceChangePayload<T extends SingleChoiceValue = SingleC
   checked: boolean;
 }
 
+export interface SingleChoiceSubmitValue<T extends SingleChoiceValue = SingleChoiceValue> {
+  questionId: string;
+  value: T | null;
+}
+
+export interface SingleChoiceRef<T extends SingleChoiceValue = SingleChoiceValue> {
+  init: (value?: T | null) => void;
+  getSubmitValue: () => SingleChoiceSubmitValue<T>;
+}
+
 export interface SingleChoiceProps<T extends SingleChoiceValue = SingleChoiceValue> {
+  questionId: string;
   options: Array<SingleChoiceOption<T>>;
   value?: T | null;
   defaultValue?: T | null;

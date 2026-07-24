@@ -22,9 +22,20 @@ export interface ImageSingleChoiceChangePayload<
   checked: boolean;
 }
 
-export interface ImageSingleChoiceProps<
+export interface ImageSingleChoiceSubmitValue<
   T extends ImageSingleChoiceValue = ImageSingleChoiceValue,
 > {
+  questionId: string;
+  value: T | null;
+}
+
+export interface ImageSingleChoiceRef<T extends ImageSingleChoiceValue = ImageSingleChoiceValue> {
+  init: (value?: T | null) => void;
+  getSubmitValue: () => ImageSingleChoiceSubmitValue<T>;
+}
+
+export interface ImageSingleChoiceProps<T extends ImageSingleChoiceValue = ImageSingleChoiceValue> {
+  questionId: string;
   options: Array<ImageSingleChoiceOption<T>>;
   value?: T | null;
   defaultValue?: T | null;

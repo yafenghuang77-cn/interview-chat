@@ -1,13 +1,15 @@
-import React, { useState } from 'react';
+import React, { useState, forwardRef, useImperativeHandle } from 'react';
 import { View } from '@tarojs/components';
-import type { SingleChoiceOption, SingleChoiceProps } from './type';
+import type { SingleChoiceOption, SingleChoiceProps, SingleChoiceRef } from './type';
 import { joinClassNames } from './util';
 import './style.less';
 
-const SingleChoice = <T extends string | number = string | number>(
+const SingleChoiceInner = <T extends string | number = string | number>(
   props: SingleChoiceProps<T>,
+  ref: React.ForwardedRef<SingleChoiceRef<T>>,
 ): React.ReactElement => {
   const {
+    questionId,
     options,
     value,
     defaultValue = null,
@@ -18,6 +20,18 @@ const SingleChoice = <T extends string | number = string | number>(
   } = props;
   const [innerValue, setInnerValue] = useState<T | null>(defaultValue);
   const selectedValue = value !== undefined ? value : innerValue;
+
+  useImperativeHandle(
+    ref,
+    () => ({
+      init: nextValue => setInnerValue(nextValue ?? null),
+      getSubmitValue: () => ({
+        questionId,
+        value: selectedValue,
+      }),
+    }),
+    [questionId, selectedValue],
+  );
 
   const handleSelect = (option: SingleChoiceOption<T>): void => {
     const optionDisabled = disabled || option.disabled;
@@ -72,10 +86,16 @@ const SingleChoice = <T extends string | number = string | number>(
   );
 };
 
+const SingleChoice = forwardRef(SingleChoiceInner) as <T extends string | number = string | number>(
+  props: SingleChoiceProps<T> & React.RefAttributes<SingleChoiceRef<T>>,
+) => React.ReactElement;
+
 export default SingleChoice;
 export type {
   SingleChoiceChangePayload,
   SingleChoiceOption,
   SingleChoiceProps,
+  SingleChoiceRef,
+  SingleChoiceSubmitValue,
   SingleChoiceValue,
 } from './type';

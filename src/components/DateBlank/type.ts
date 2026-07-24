@@ -7,10 +7,21 @@ export interface DateBlankChangePayload {
   value: string;
 }
 
+export interface DateBlankSubmitValue {
+  questionId: string;
+  value: string | null;
+}
+
+export interface DateBlankRef {
+  init: (value?: string | null) => void;
+  getSubmitValue: () => DateBlankSubmitValue;
+}
+
 export type DateBlankMode = 'date' | 'datetime';
 
 export interface DateBlankProps {
   type?: DateBlankType;
+  questionId: string;
   mode?: DateBlankMode;
   value?: string | null;
   defaultValue?: string | null;

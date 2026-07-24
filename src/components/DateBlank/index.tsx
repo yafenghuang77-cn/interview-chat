@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useImperativeHandle, forwardRef } from 'react';
 import { Picker, Text, View, type CommonEvent } from '@tarojs/components';
-import type { DateBlankProps } from './type';
+import type { DateBlankProps, DateBlankRef } from './type';
 import {
   createDatetimeRange,
   formatDatetimeValue,
@@ -15,8 +15,9 @@ import './style.less';
 type DateChangeEvent = CommonEvent<{ value: string }>;
 type DatetimeChangeEvent = CommonEvent<{ value: number[] }>;
 
-const DateBlank: React.FC<DateBlankProps> = props => {
+const DateBlank = forwardRef<DateBlankRef, DateBlankProps>((props, ref) => {
   const {
+    questionId,
     mode = 'datetime',
     value,
     defaultValue = null,
@@ -34,6 +35,18 @@ const DateBlank: React.FC<DateBlankProps> = props => {
   const [innerValue, setInnerValue] = useState<string | null>(defaultValue);
   const currentValue = value !== undefined ? value : innerValue;
   const hasValue = Boolean(currentValue);
+
+  useImperativeHandle(
+    ref,
+    () => ({
+      init: nextValue => setInnerValue(nextValue || null),
+      getSubmitValue: () => ({
+        questionId,
+        value: currentValue,
+      }),
+    }),
+    [currentValue, questionId],
+  );
 
   const handleChange = (event: DateChangeEvent): void => {
     const nextValue = event.detail.value;
@@ -115,7 +128,14 @@ const DateBlank: React.FC<DateBlankProps> = props => {
       {renderPicker()}
     </View>
   );
-};
+});
 
 export default DateBlank;
-export type { DateBlankChangePayload, DateBlankMode, DateBlankProps, DateBlankType } from './type';
+export type {
+  DateBlankChangePayload,
+  DateBlankMode,
+  DateBlankProps,
+  DateBlankRef,
+  DateBlankSubmitValue,
+  DateBlankType,
+} from './type';

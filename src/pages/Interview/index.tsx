@@ -28,7 +28,7 @@ const InterviewPage: React.FC = () => {
                   <AnchorChat
                     content={item.content}
                     role={item.role}
-                    duration={item.duration || []}
+                    duration={item.duration || null}
                   />
                 )}
                 {item?.config && Object.keys(item?.config).length > 0 && (
@@ -42,8 +42,8 @@ const InterviewPage: React.FC = () => {
       {/* 底部提交栏 */}
       <View className="interview_footer">
         <Button
-          className={`interview_submit`}
-          hoverClass={'interview_submit--hover'}
+          className="interview_submit"
+          hoverClass="interview_submit--hover"
           onClick={handleSubmit}
         >
           提交
