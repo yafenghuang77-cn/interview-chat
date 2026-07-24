@@ -1,8 +1,11 @@
 import React from 'react';
 import { View, Button, ScrollView } from '@tarojs/components';
 import AnchorChat from './components/AnchorChat';
+import AnswerAreaList from './components/AnswerAreaList';
 import mockData from '../../common/mock';
 import './index.less';
+
+console.log(mockData, 'mockData');
 
 const InterviewPage: React.FC = () => {
   const handleSubmit = () => {};
@@ -14,8 +17,14 @@ const InterviewPage: React.FC = () => {
             return (
               <View key={item.id} className="interview__round">
                 {item.content && item.content.length > 0 && (
-                  <AnchorChat content={item.content} role={item.role} duration={item.duration} />
+                  <AnchorChat
+                    content={item.content}
+                    role={item.role}
+                    duration={item.duration || []}
+                  />
                 )}
+
+                <AnswerAreaList />
               </View>
             );
           })}
