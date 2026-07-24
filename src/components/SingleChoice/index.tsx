@@ -1,70 +1,70 @@
-/**
- * 单选题
- */
+import React, { useState } from 'react';
+import { View } from '@tarojs/components';
+import type { SingleChoiceOption, SingleChoiceProps } from './type';
+import { joinClassNames } from './util';
+import './style.less';
 
-import React from 'react';
-import { View, Text, Image } from '@tarojs/components';
-import { resolveChoiceLayout } from '../QuestionItem/helpers';
-import type { SingleChoiceProps } from './types';
-import './index.less';
+const SingleChoice = <T extends string | number = string | number>(
+  props: SingleChoiceProps<T>,
+): React.ReactElement => {
+  const {
+    options,
+    value,
+    defaultValue = null,
+    disabled = false,
+    className = '',
+    optionClassName = '',
+    onChange,
+  } = props;
+  const [innerValue, setInnerValue] = useState<T | null>(defaultValue);
+  const selectedValue = value !== undefined ? value : innerValue;
 
-/**
- * 单选题。
- *
- * - 文字选项（list）：圆形单选标记 + 文字。
- * - 图片选项（grid）：图片卡片，选中态在右上角打勾（图片单选）。
- * 点击某项即选中该项，回填单个 optionId。
- */
-const SingleChoice = ({ question, value, onChange, disabled }: SingleChoiceProps) => {
-  const options = question.options || [];
-  const layout = resolveChoiceLayout(question);
+  const handleSelect = (option: SingleChoiceOption<T>): void => {
+    const optionDisabled = disabled || option.disabled;
 
-  const handleSelect = (optionId: string) => {
-    if (disabled) return;
-    onChange(optionId);
+    if (optionDisabled) {
+      return;
+    }
+
+    if (value === undefined) {
+      setInnerValue(option.value);
+    }
+
+    onChange?.(option.value);
   };
 
-  if (layout === 'grid') {
-    return (
-      <View className="question-item__imageList">
-        {options.map(option => {
-          const selected = value === option.id;
-          return (
-            <View
-              key={option.id}
-              className={`question-item__imageOption ${selected ? 'question-item__imageOption--active' : ''}`}
-              onClick={() => handleSelect(option.id)}
-            >
-              {/* 图片在上 */}
-              <Image
-                className="question-item__optionImage"
-                src={option.image || ''}
-                mode="aspectFill"
-              />
-              {/* 图片下方：圆形单选标记 + 文字 */}
-              <View className="question-item__imageOptionBar">
-                <View className="question-item__radio" />
-                <Text className="question-item__optionLabel">{option.label}</Text>
-              </View>
-            </View>
-          );
-        })}
-      </View>
-    );
-  }
-
   return (
-    <View className="question-item__options">
+    <View className={joinClassNames(['single-choice', className])}>
       {options.map(option => {
-        const selected = value === option.id;
+        const checked = selectedValue === option.value;
+        const optionDisabled = disabled || option.disabled;
+
         return (
           <View
-            key={option.id}
-            className={`question-item__option ${selected ? 'question-item__option--active' : ''}`}
-            onClick={() => handleSelect(option.id)}
+            key={option.value}
+            className={joinClassNames([
+              'single-choice__option',
+              checked && 'single-choice__option--checked',
+              optionDisabled && 'single-choice__option--disabled',
+              optionClassName,
+            ])}
+            onClick={() => handleSelect(option)}
           >
-            <View className="question-item__radio" />
-            <Text className="question-item__optionLabel">{option.label}</Text>
+            <View
+              className={joinClassNames([
+                'single-choice__indicator',
+                checked && 'single-choice__indicator--checked',
+              ])}
+            >
+              {checked && <View className="single-choice__indicator-dot" />}
+            </View>
+
+            <View className="single-choice__content">
+              <View className="single-choice__label">{option.label}</View>
+              {option.description && (
+                <View className="single-choice__description">{option.description}</View>
+              )}
+            </View>
           </View>
         );
       })}
@@ -73,3 +73,9 @@ const SingleChoice = ({ question, value, onChange, disabled }: SingleChoiceProps
 };
 
 export default SingleChoice;
+export type {
+  SingleChoiceChangePayload,
+  SingleChoiceOption,
+  SingleChoiceProps,
+  SingleChoiceValue,
+} from './type';

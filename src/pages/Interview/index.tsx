@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { useLoad } from '@tarojs/taro';
 import { View, Button, ScrollView } from '@tarojs/components';
 import AnchorChat from './components/AnchorChat';
 import AnswerAreaList from './components/AnswerAreaList';
@@ -8,12 +9,19 @@ import './index.less';
 console.log(mockData, 'mockData');
 
 const InterviewPage: React.FC = () => {
+  const [dataList, setDataList] = useState(mockData);
+
+  useLoad(() => {
+    setDataList(mockData);
+  });
+
   const handleSubmit = () => {};
+
   return (
     <View className="interview">
       <ScrollView className="interview_scroll" scrollY scrollWithAnimation>
         <View className="interview_answerList">
-          {mockData.map(item => {
+          {dataList.map(item => {
             return (
               <View key={item.id} className="interview__round">
                 {item.content && item.content.length > 0 && (
@@ -23,8 +31,9 @@ const InterviewPage: React.FC = () => {
                     duration={item.duration || []}
                   />
                 )}
-
-                <AnswerAreaList />
+                {item?.config && Object.keys(item?.config).length > 0 && (
+                  <AnswerAreaList options={item.config} />
+                )}
               </View>
             );
           })}
