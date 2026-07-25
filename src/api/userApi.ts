@@ -40,8 +40,6 @@ export interface UserInfo {
 export const getCurrentUserInfo = (params?: Partial<UserinfoParams>): Promise<UserInfo> => {
   return get<UserInfo>({
     url: '/api/users',
-    data: {
-      userId: 1,
-    },
+    data: params,
   });
 };

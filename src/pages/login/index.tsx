@@ -7,6 +7,8 @@ import './index.less';
 
 const DEFAULT_REDIRECT_URL = '/pages/index/index';
 
+type LoginField = 'account' | 'password';
+
 const getInputValue = (event: { detail: { value?: string } }): string => {
   return event.detail.value || '';
 };
@@ -22,8 +24,20 @@ const LoginPage: React.FC = () => {
   }, [router.params?.redirect]);
   const [account, setAccount] = useState('');
   const [password, setPassword] = useState('');
+  const [passwordVisible, setPasswordVisible] = useState(false);
+  const [focusedField, setFocusedField] = useState<LoginField | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const submitDisabled = submitting || account.trim().length === 0 || password.length === 0;
+
+  const getFieldClassName = (field: LoginField, filled: boolean): string => {
+    return [
+      'login-page__field',
+      focusedField === field ? 'login-page__field--focus' : '',
+      filled ? 'login-page__field--filled' : '',
+    ]
+      .filter(Boolean)
+      .join(' ');
+  };
 
   const handleLogin = async () => {
     if (submitDisabled) {
@@ -70,32 +84,66 @@ const LoginPage: React.FC = () => {
       </View>
 
       <View className="login-page__form">
-        <View className="login-page__field">
-          <Text className="login-page__label">账号</Text>
-          <Input
-            className="login-page__input"
-            value={account}
-            placeholder="请输入账号"
-            placeholderStyle="color: #a8abb2;"
-            cursorColor="#07c160"
-            confirmType="next"
-            onInput={event => setAccount(getInputValue(event))}
-          />
+        <View className={getFieldClassName('account', account.trim().length > 0)}>
+          <View className="login-page__field-icon">
+            <View className="login-page__field-symbol login-page__field-symbol--user" />
+          </View>
+          <View className="login-page__field-body">
+            <Text className="login-page__label">账号</Text>
+            <Input
+              className="login-page__input"
+              value={account}
+              placeholder="请输入账号"
+              placeholderStyle="color: #a8abb2;"
+              cursorColor="#07c160"
+              confirmType="next"
+              onFocus={() => setFocusedField('account')}
+              onBlur={() => setFocusedField(null)}
+              onInput={event => setAccount(getInputValue(event))}
+            />
+          </View>
+          <View
+            className={`login-page__field-action ${
+              account ? '' : 'login-page__field-action--hidden'
+            }`}
+            hoverClass="login-page__field-action--hover"
+            onClick={() => setAccount('')}
+          >
+            <View className="login-page__clear-icon" />
+          </View>
         </View>
 
-        <View className="login-page__field">
-          <Text className="login-page__label">密码</Text>
-          <Input
-            className="login-page__input"
-            value={password}
-            password
-            placeholder="请输入密码"
-            placeholderStyle="color: #a8abb2;"
-            cursorColor="#07c160"
-            confirmType="done"
-            onInput={event => setPassword(getInputValue(event))}
-            onConfirm={handleLogin}
-          />
+        <View className={getFieldClassName('password', password.length > 0)}>
+          <View className="login-page__field-icon">
+            <View className="login-page__field-symbol login-page__field-symbol--lock" />
+          </View>
+          <View className="login-page__field-body">
+            <Text className="login-page__label">密码</Text>
+            <Input
+              className="login-page__input"
+              value={password}
+              password={!passwordVisible}
+              placeholder="请输入密码"
+              placeholderStyle="color: #a8abb2;"
+              cursorColor="#07c160"
+              confirmType="done"
+              onFocus={() => setFocusedField('password')}
+              onBlur={() => setFocusedField(null)}
+              onInput={event => setPassword(getInputValue(event))}
+              onConfirm={handleLogin}
+            />
+          </View>
+          <View
+            className="login-page__field-action"
+            hoverClass="login-page__field-action--hover"
+            onClick={() => setPasswordVisible(visible => !visible)}
+          >
+            <View
+              className={`login-page__eye-icon ${
+                passwordVisible ? 'login-page__eye-icon--open' : ''
+              }`}
+            />
+          </View>
         </View>
 
         <Button
