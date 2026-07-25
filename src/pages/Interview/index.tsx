@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { useLoad, useRouter } from '@tarojs/taro';
+import { useDidHide, useDidShow, useLoad, useRouter, useUnload } from '@tarojs/taro';
 import { View, Button, ScrollView } from '@tarojs/components';
 import { QUESTION_COMPONENT_TYPE, type QuestionComponentType } from '@/common/constants';
 import {
@@ -16,6 +16,8 @@ import type { InterviewAnswerSubmitValue } from './types';
 import './index.less';
 
 const POLLING_INTERVAL = 2000;
+const SCROLL_BOTTOM_ANCHOR_ID = 'interviewBottom';
+const SCROLL_RENDER_DELAY = 80;
 const DISPLAY_QUESTION_TYPES: QuestionComponentType[] = [
   QUESTION_COMPONENT_TYPE.IMAGE_DISPLAY,
   QUESTION_COMPONENT_TYPE.VIDEO_DISPLAY,
@@ -35,10 +37,18 @@ const InterviewPage: React.FC = () => {
   const submittedQuestionIds = useAppSelector(state => state.interview.submittedQuestionIds);
   const answerAreaRefs = useRef<Record<string, AnswerAreaListRef | null>>({});
   const cacheRenderInitializedRef = useRef(false);
+  const pollingTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const pageVisibleRef = useRef(false);
+  const scrollTimerRefs = useRef<Array<ReturnType<typeof setTimeout>>>([]);
   const [typingFinishedMap, setTypingFinishedMap] = useState<Record<number, boolean>>({});
   const [answerCompleteMap, setAnswerCompleteMap] = useState<Record<string, boolean>>({});
   const [visibleItemCount, setVisibleItemCount] = useState(0);
+  const [scrollIntoView, setScrollIntoView] = useState('');
   const visibleDataList = dataList.slice(0, visibleItemCount);
+  const lastVisibleItemId = visibleDataList[visibleDataList.length - 1]?.id || 0;
+  const lastVisibleTypingFinished = lastVisibleItemId
+    ? typingFinishedMap[lastVisibleItemId]
+    : false;
   const currentItem = visibleDataList.find(item => item.config?.questionId === currentQuestionId);
   const currentAnswerVisible = currentItem
     ? Boolean(currentItem.config) && (!currentItem.content || typingFinishedMap[currentItem.id])
@@ -57,12 +67,29 @@ const InterviewPage: React.FC = () => {
   const submitDisabled =
     !currentQuestionId || isSubmitting || !(currentAnswerComplete || currentAnswerRefComplete);
 
+  const clearScrollTimers = useCallback(() => {
+    scrollTimerRefs.current.forEach(timer => clearTimeout(timer));
+    scrollTimerRefs.current = [];
+  }, []);
+
+  const scrollToBottom = useCallback(() => {
+    clearScrollTimers();
+    setScrollIntoView('');
+
+    const timer = setTimeout(() => {
+      setScrollIntoView(SCROLL_BOTTOM_ANCHOR_ID);
+    }, SCROLL_RENDER_DELAY);
+
+    scrollTimerRefs.current.push(timer);
+  }, [clearScrollTimers]);
+
   useLoad(() => {
     cacheRenderInitializedRef.current = false;
     dispatch(resetInterviewFlow(surveyId));
     setTypingFinishedMap({});
     setAnswerCompleteMap({});
     setVisibleItemCount(0);
+    scrollToBottom();
   });
 
   useEffect(() => {
@@ -89,17 +116,48 @@ const InterviewPage: React.FC = () => {
     dispatch(queryCurrentInterviewQuestion());
   }, [dispatch]);
 
-  useEffect(() => {
-    if (isPollingPaused || isFinished) {
-      return undefined;
+  const stopPollingTimer = useCallback(() => {
+    if (pollingTimerRef.current) {
+      clearInterval(pollingTimerRef.current);
+      pollingTimerRef.current = null;
+    }
+  }, []);
+
+  const startPolling = useCallback(() => {
+    if (!pageVisibleRef.current || isPollingPaused || isFinished) {
+      stopPollingTimer();
+      return;
+    }
+
+    if (pollingTimerRef.current) {
+      return;
     }
 
     pollCurrentQuestion();
+    pollingTimerRef.current = setInterval(pollCurrentQuestion, POLLING_INTERVAL);
+  }, [isFinished, isPollingPaused, pollCurrentQuestion, stopPollingTimer]);
 
-    const timer = setInterval(pollCurrentQuestion, POLLING_INTERVAL);
+  useDidShow(() => {
+    pageVisibleRef.current = true;
+    startPolling();
+    scrollToBottom();
+  });
 
-    return () => clearInterval(timer);
-  }, [isFinished, isPollingPaused, pollCurrentQuestion]);
+  useDidHide(() => {
+    pageVisibleRef.current = false;
+    clearScrollTimers();
+    stopPollingTimer();
+  });
+
+  useUnload(() => {
+    pageVisibleRef.current = false;
+    clearScrollTimers();
+    stopPollingTimer();
+  });
+
+  useEffect(() => {
+    startPolling();
+  }, [startPolling]);
 
   useEffect(() => {
     if (dataList.length === 0) {
@@ -115,6 +173,12 @@ const InterviewPage: React.FC = () => {
       return 1;
     });
   }, [dataList.length]);
+
+  useEffect(() => {
+    if (lastVisibleItemId) {
+      scrollToBottom();
+    }
+  }, [lastVisibleItemId, lastVisibleTypingFinished, scrollToBottom]);
 
   useEffect(() => {
     if (visibleItemCount <= 0 || visibleItemCount >= dataList.length) {
@@ -156,6 +220,7 @@ const InterviewPage: React.FC = () => {
     }
 
     dispatch(submitCurrentInterviewQuestion(submitValue));
+    scrollToBottom();
   };
 
   const handleTypingFinish = useCallback((itemId: number) => {
@@ -209,7 +274,12 @@ const InterviewPage: React.FC = () => {
 
   return (
     <View className="interview">
-      <ScrollView className="interview_scroll" scrollY scrollWithAnimation>
+      <ScrollView
+        className="interview_scroll"
+        scrollY
+        scrollWithAnimation
+        scrollIntoView={scrollIntoView}
+      >
         <View className="interview_answerList">
           {visibleDataList.map(item => {
             const shouldShowAnswer =
@@ -253,6 +323,7 @@ const InterviewPage: React.FC = () => {
               </View>
             );
           })}
+          <View id={SCROLL_BOTTOM_ANCHOR_ID} className="interview_bottomAnchor" />
         </View>
       </ScrollView>
       {/* 底部提交栏 */}

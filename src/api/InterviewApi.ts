@@ -3,10 +3,12 @@ import type { InterviewAnswerSubmitValue, InterviewItem } from '@/pages/Intervie
 
 const mockInterviewData = mockData as InterviewItem[];
 const MOCK_SUBMIT_DELAY = 500;
+const MOCK_WAITING_COMPLETE_DELAY = 3000;
 
 let currentIndex = 0;
 let submittedQuestionIds = new Set<string>();
 let durationByItemId = new Map<number, InterviewItem['duration']>();
+let waitingProgressStartTimeByKey = new Map<string, number>();
 
 const wait = (delay: number): Promise<void> =>
   new Promise(resolve => {
@@ -75,14 +77,45 @@ export type SubmitSurveyQuestionResponse = {
   message: string;
 };
 
+export type WaitingAnswerProgressParams = {
+  surveyId: string;
+  questionId?: string;
+  sessionId?: string;
+  completedAnswerCount?: number;
+  totalAnswerCount?: number;
+};
+
+export type WaitingAnswerProgressResponse = {
+  data: {
+    completedAnswerCount: number;
+    totalAnswerCount: number;
+    progressPercent: number;
+    isCompleted: boolean;
+  };
+};
+
 const resetMockSurveyProgress = (): void => {
   currentIndex = 0;
   submittedQuestionIds = new Set<string>();
   durationByItemId = new Map<number, InterviewItem['duration']>();
+  waitingProgressStartTimeByKey = new Map<string, number>();
 };
 
 const getQuestionItemIndex = (questionId: string): number =>
   mockInterviewData.findIndex(item => item.config?.questionId === questionId);
+
+const getFiniteCount = (value: unknown, fallback: number): number => {
+  const nextValue = Number(value);
+
+  return Number.isFinite(nextValue) ? nextValue : fallback;
+};
+
+const getWaitingProgressKey = (params: WaitingAnswerProgressParams): string =>
+  [
+    params.surveyId,
+    params.questionId || 'default-question',
+    params.sessionId || 'default-session',
+  ].join('_');
 
 export const getCurrentSurveyQuestion = (
   params: CurrentSurveyQuestionParams = {},
@@ -145,5 +178,53 @@ export const submitSurveyQuestion = async (
   return {
     code: 1,
     message: '提交成功',
+  };
+};
+
+export const getWaitingAnswerProgress = (
+  params: WaitingAnswerProgressParams,
+): WaitingAnswerProgressResponse => {
+  const questionConfig = params.questionId
+    ? mockInterviewData.find(item => item.config?.questionId === params.questionId)?.config
+    : null;
+  const initialCompletedCount = getFiniteCount(
+    questionConfig?.completedAnswerCount ?? params.completedAnswerCount,
+    0,
+  );
+  const totalAnswerCount = Math.max(
+    getFiniteCount(questionConfig?.totalAnswerCount ?? params.totalAnswerCount, 0),
+    initialCompletedCount,
+  );
+  const progressKey = getWaitingProgressKey(params);
+  const startTime = waitingProgressStartTimeByKey.get(progressKey) || Date.now();
+
+  waitingProgressStartTimeByKey.set(progressKey, startTime);
+
+  if (totalAnswerCount <= 0) {
+    return {
+      data: {
+        completedAnswerCount: 0,
+        totalAnswerCount: 0,
+        progressPercent: 100,
+        isCompleted: true,
+      },
+    };
+  }
+
+  const elapsedRatio = Math.min((Date.now() - startTime) / MOCK_WAITING_COMPLETE_DELAY, 1);
+  const progressValue =
+    initialCompletedCount + (totalAnswerCount - initialCompletedCount) * elapsedRatio;
+  const isCompleted = elapsedRatio >= 1 || progressValue >= totalAnswerCount;
+  const completedAnswerCount = isCompleted
+    ? totalAnswerCount
+    : Math.min(Math.floor(progressValue), totalAnswerCount - 1);
+
+  return {
+    data: {
+      completedAnswerCount,
+      totalAnswerCount,
+      progressPercent: Math.min((progressValue / totalAnswerCount) * 100, 100),
+      isCompleted,
+    },
   };
 };

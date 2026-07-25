@@ -1,12 +1,14 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { View, Text } from '@tarojs/components';
 import Taro, { useRouter } from '@tarojs/taro';
+import { getWaitingAnswerProgress } from '@/api/InterviewApi';
 import './index.less';
 
 const DEFAULT_SURVEY_ID = 'mock-survey-001';
 const DEFAULT_COMPLETED_COUNT = 3;
 const DEFAULT_TOTAL_COUNT = 8;
-const MOCK_WAITING_DELAY = 3000;
+const MOCK_REDIRECT_DELAY = 350;
+const PROGRESS_POLLING_INTERVAL = 1000;
 
 const getNumberParam = (value: string | undefined, fallback: number): number => {
   const nextValue = Number(value);
@@ -17,16 +19,21 @@ const getNumberParam = (value: string | undefined, fallback: number): number => 
 const InterviewWaitingPage: React.FC = () => {
   const router = useRouter();
   const surveyId = String(router.params?.surveyId || DEFAULT_SURVEY_ID);
+  const questionId = router.params?.questionId ? String(router.params.questionId) : undefined;
   const totalCount = getNumberParam(router.params?.total, DEFAULT_TOTAL_COUNT);
   const initialCompletedCount = getNumberParam(router.params?.completed, DEFAULT_COMPLETED_COUNT);
   const [completedCount, setCompletedCount] = useState(initialCompletedCount);
-  const progressPercent = useMemo(() => {
+  const [progressPercent, setProgressPercent] = useState(() => {
     if (totalCount <= 0) {
       return 0;
     }
 
-    return Math.min(Math.max((completedCount / totalCount) * 100, 0), 100);
-  }, [completedCount, totalCount]);
+    return Math.min(Math.max((initialCompletedCount / totalCount) * 100, 0), 100);
+  });
+  const normalizedProgressPercent = useMemo(
+    () => Math.min(Math.max(progressPercent, 0), 100),
+    [progressPercent],
+  );
 
   const handleEnterInterview = useCallback(() => {
     Taro.redirectTo({
@@ -35,13 +42,44 @@ const InterviewWaitingPage: React.FC = () => {
   }, [surveyId]);
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setCompletedCount(totalCount);
-      handleEnterInterview();
-    }, MOCK_WAITING_DELAY);
+    let progressTimer: ReturnType<typeof setInterval> | null = null;
+    let redirectTimer: ReturnType<typeof setTimeout> | null = null;
+    const queryProgress = () => {
+      const response = getWaitingAnswerProgress({
+        surveyId,
+        questionId,
+        completedAnswerCount: initialCompletedCount,
+        totalAnswerCount: totalCount,
+      });
 
-    return () => clearTimeout(timer);
-  }, [handleEnterInterview, totalCount]);
+      setCompletedCount(response.data.completedAnswerCount);
+      setProgressPercent(response.data.progressPercent);
+
+      if (response.data.isCompleted) {
+        if (progressTimer) {
+          clearInterval(progressTimer);
+          progressTimer = null;
+        }
+
+        redirectTimer = setTimeout(handleEnterInterview, MOCK_REDIRECT_DELAY);
+      }
+    };
+
+    queryProgress();
+    if (!redirectTimer) {
+      progressTimer = setInterval(queryProgress, PROGRESS_POLLING_INTERVAL);
+    }
+
+    return () => {
+      if (progressTimer) {
+        clearInterval(progressTimer);
+      }
+
+      if (redirectTimer) {
+        clearTimeout(redirectTimer);
+      }
+    };
+  }, [handleEnterInterview, initialCompletedCount, questionId, surveyId, totalCount]);
 
   return (
     <View className="interviewWaiting">
@@ -60,7 +98,7 @@ const InterviewWaitingPage: React.FC = () => {
         <View className="interviewWaiting_progressTrack">
           <View
             className="interviewWaiting_progressBar"
-            style={{ width: `${progressPercent}%` }}
+            style={{ width: `${normalizedProgressPercent.toFixed(2)}%` }}
           />
         </View>
       </View>

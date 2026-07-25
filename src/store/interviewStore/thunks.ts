@@ -35,6 +35,7 @@ const navigateToMockWaitingPage = (surveyId: string, config: AnswerConfig): void
   Taro.redirectTo({
     url:
       `/pages/InterviewWaiting/index?surveyId=${encodeURIComponent(surveyId)}` +
+      `&questionId=${encodeURIComponent(config.questionId)}` +
       `&completed=${Number(config.completedAnswerCount)}` +
       `&total=${Number(config.totalAnswerCount)}`,
   });
