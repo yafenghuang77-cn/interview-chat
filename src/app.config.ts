@@ -1,5 +1,10 @@
 export default defineAppConfig({
-  pages: ['pages/index/index', 'pages/InterviewWaiting/index', 'pages/Interview/index'],
+  pages: [
+    'pages/login/index',
+    'pages/index/index',
+    'pages/InterviewWaiting/index',
+    'pages/Interview/index',
+  ],
   window: {
     backgroundTextStyle: 'light',
     navigationBarBackgroundColor: '#fff',
