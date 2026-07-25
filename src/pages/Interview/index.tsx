@@ -1,18 +1,18 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useLoad } from '@tarojs/taro';
 import { View, Button, ScrollView } from '@tarojs/components';
+import { resetDataList } from '@/store/interviewStore';
+import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import AnchorChat from './components/AnchorChat';
 import AnswerAreaList from './components/AnswerAreaList';
-import mockData from '../../common/mock';
 import './index.less';
 
-console.log(mockData, 'mockData');
-
 const InterviewPage: React.FC = () => {
-  const [dataList, setDataList] = useState(mockData);
+  const dispatch = useAppDispatch();
+  const dataList = useAppSelector(state => state.interview.dataList);
 
   useLoad(() => {
-    setDataList(mockData);
+    dispatch(resetDataList());
   });
 
   const handleSubmit = () => {};

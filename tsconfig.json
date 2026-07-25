@@ -13,6 +13,7 @@
     "jsx": "react-jsx",
     "allowJs": true,
     "resolveJsonModule": true,
+    "skipLibCheck": true,
 
     // 严格模式（蚂蚁金服规范：开启完整类型检查）
     "strict": true,               // 启用所有严格检查（含 noImplicitAny、strictNullChecks 等）
@@ -25,6 +26,7 @@
     "typeRoots": [
       "node_modules/@types"
     ],
+    "types": ["node", "webpack-env"],
     "paths": {
       // TS5090 leading './'
       "@/*": ["./src/*"]
