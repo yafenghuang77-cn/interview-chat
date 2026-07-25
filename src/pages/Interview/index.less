@@ -65,9 +65,20 @@
       background: @primary-dark;
     }
 
+    &--active,
+    &--active[disabled] {
+      color: #ffffff;
+      background: @primary;
+    }
+
     &--disabled {
       background: #dddddd;
       color: #ffffff;
+    }
+
+    &--disabled[disabled] {
+      color: #ffffff;
+      background: #dddddd;
     }
   }
 }

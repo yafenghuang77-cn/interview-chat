@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useImperativeHandle } from 'react';
 import { Text, View } from '@tarojs/components';
 import {
   BidirectionalRating,
@@ -23,95 +23,122 @@ import {
   TextBlank,
   VideoDisplay,
 } from '@/components';
-import { QUESTION_COMPONENT_TYPE, type QuestionComponentType } from '@/common/constants';
+import { QUESTION_COMPONENT_TYPE } from '@/common/constants';
+import type { AnswerConfig, InterviewAnswerSubmitValue } from '../types';
 import './AnswerAreaList.less';
 
-type ChoiceOptionConfig = {
-  id?: string | number;
-  value?: string | number;
-  label: string;
-  description?: string;
-  disabled?: boolean;
-  image?: string;
-  imageMode?: 'scaleToFill' | 'aspectFit' | 'aspectFill' | 'widthFix';
-  imageAlt?: string;
+export type AnswerAreaListRef = {
+  getSubmitValue: () => InterviewAnswerSubmitValue | null;
+  isComplete: () => boolean;
 };
 
-type MatrixRowConfig = {
-  id?: string | number;
-  value?: string | number;
-  label: string;
-  description?: string;
-  leftLabel?: string;
-  rightLabel?: string;
-  disabled?: boolean;
-};
-
-type MatrixColumnConfig = {
-  id?: string | number;
-  value?: string | number;
-  label: string;
-  description?: string;
-  disabled?: boolean;
-};
-
-export type AnswerConfig = {
-  type: QuestionComponentType;
-  questionId: string;
-  questionText: string;
-  description?: string;
-  options?: ChoiceOptionConfig[];
-  placeholder?: string;
-  defaultValue?: string | number | Array<string | number> | null;
-  disabled?: boolean;
-  required?: boolean;
-  maxlength?: number;
-  min?: number;
-  max?: number;
-  requiredMessage?: string;
-  errorMessage?: string;
-  minMessage?: string;
-  maxMessage?: string;
-  rows?: number | MatrixRowConfig[];
-  autoHeight?: boolean;
-  mode?: 'date' | 'datetime';
-  items?: Array<{
-    label: string;
-    placeholder?: string;
-    disabled?: boolean;
-  }>;
-  start?: string;
-  end?: string;
-  fields?: 'year' | 'month' | 'day';
-  images?: Array<{
-    src: string;
-    title?: string;
-    description?: string;
-    mode?: 'scaleToFill' | 'aspectFit' | 'aspectFill' | 'widthFix';
-    alt?: string;
-  }>;
-  preview?: boolean;
-  src?: string;
-  poster?: string;
-  videos?: Array<{
-    src: string;
-    title?: string;
-    description?: string;
-    poster?: string;
-  }>;
-  columns?: MatrixColumnConfig[];
-  lowLabel?: string;
-  highLabel?: string;
-  leftLabel?: string;
-  rightLabel?: string;
+type AnswerComponentRef = {
+  getSubmitValue: () => InterviewAnswerSubmitValue;
 };
 
 interface AnswerAreaListProps {
   options: AnswerConfig;
+  disabled?: boolean;
+  onCompleteChange?: (complete: boolean) => void;
 }
 
-const AnswerAreaList: React.FC<AnswerAreaListProps> = props => {
-  const { options } = props;
+const AnswerAreaList = React.forwardRef<AnswerAreaListRef, AnswerAreaListProps>((props, ref) => {
+  const { options, disabled = false, onCompleteChange } = props;
+  const answerDisabled = disabled || Boolean(options.disabled);
+  const answerRef = React.useRef<AnswerComponentRef | null>(null);
+  const setAnswerRef = React.useCallback((nextRef: AnswerComponentRef | null) => {
+    answerRef.current = nextRef;
+  }, []);
+
+  const getRowCount = React.useCallback(
+    (): number => (Array.isArray(options.rows) ? options.rows.length : 0),
+    [options.rows],
+  );
+
+  const hasValue = (value: unknown): boolean => {
+    if (typeof value === 'string') {
+      return value.trim().length > 0;
+    }
+
+    if (typeof value === 'number') {
+      return Number.isFinite(value);
+    }
+
+    if (Array.isArray(value)) {
+      return value.length > 0 && value.every(item => hasValue(item));
+    }
+
+    if (value && typeof value === 'object') {
+      return Object.values(value).some(item => hasValue(item));
+    }
+
+    return value !== null && value !== undefined;
+  };
+
+  const isEveryRowAnswered = React.useCallback(
+    (value: unknown): boolean => {
+      if (!value || typeof value !== 'object' || Array.isArray(value)) {
+        return false;
+      }
+
+      const rowCount = getRowCount();
+
+      return rowCount > 0 && Object.values(value).filter(item => hasValue(item)).length >= rowCount;
+    },
+    [getRowCount],
+  );
+
+  const isAnswerValueComplete = React.useCallback(
+    (value: unknown): boolean => {
+      switch (options.type) {
+        case QUESTION_COMPONENT_TYPE.IMAGE_DISPLAY:
+        case QUESTION_COMPONENT_TYPE.VIDEO_DISPLAY:
+          return true;
+
+        case QUESTION_COMPONENT_TYPE.MULTI_RATING:
+        case QUESTION_COMPONENT_TYPE.MULTI_BIDIRECTIONAL_RATING:
+        case QUESTION_COMPONENT_TYPE.MATRIX_SINGLE_CHOICE:
+        case QUESTION_COMPONENT_TYPE.MATRIX_MULTI_CHOICE:
+        case QUESTION_COMPONENT_TYPE.MATRIX_RATING:
+        case QUESTION_COMPONENT_TYPE.MATRIX_BIDIRECTIONAL_RATING:
+          return isEveryRowAnswered(value);
+
+        default:
+          return hasValue(value);
+      }
+    },
+    [isEveryRowAnswered, options.type],
+  );
+
+  const isAnswerComplete = React.useCallback((): boolean => {
+    const submitValue = answerRef.current?.getSubmitValue();
+
+    return isAnswerValueComplete(submitValue?.value);
+  }, [isAnswerValueComplete]);
+
+  const emitValueCompleteChange = React.useCallback(
+    (value: unknown, valid = true) => {
+      onCompleteChange?.(valid && isAnswerValueComplete(value));
+    },
+    [isAnswerValueComplete, onCompleteChange],
+  );
+
+  const emitCurrentCompleteChange = React.useCallback(() => {
+    onCompleteChange?.(isAnswerComplete());
+  }, [isAnswerComplete, onCompleteChange]);
+
+  useEffect(() => {
+    emitCurrentCompleteChange();
+  }, [emitCurrentCompleteChange]);
+
+  useImperativeHandle(
+    ref,
+    () => ({
+      getSubmitValue: () => answerRef.current?.getSubmitValue() || null,
+      isComplete: isAnswerComplete,
+    }),
+    [isAnswerComplete],
+  );
 
   const normalizeChoiceOptions = () =>
     (options.options || []).map((item, index) => ({
@@ -180,97 +207,112 @@ const AnswerAreaList: React.FC<AnswerAreaListProps> = props => {
       case QUESTION_COMPONENT_TYPE.SINGLE_CHOICE:
         return (
           <SingleChoice
+            ref={setAnswerRef}
             questionId={options.questionId}
             options={normalizeChoiceOptions()}
             defaultValue={getDefaultChoiceValue()}
-            disabled={options.disabled}
+            disabled={answerDisabled}
+            onChange={value => emitValueCompleteChange(value)}
           />
         );
 
       case QUESTION_COMPONENT_TYPE.MULTI_CHOICE:
         return (
           <MultiChoice
+            ref={setAnswerRef}
             questionId={options.questionId}
             options={normalizeChoiceOptions()}
             defaultValue={getDefaultChoiceValues()}
-            disabled={options.disabled}
+            disabled={answerDisabled}
+            onChange={value => emitValueCompleteChange(value)}
           />
         );
 
       case QUESTION_COMPONENT_TYPE.IMAGE_SINGLE_CHOICE:
         return (
           <ImageSingleChoice
+            ref={setAnswerRef}
             questionId={options.questionId}
             options={normalizeChoiceOptions().map(item => ({
               ...item,
               image: item.image || '',
             }))}
             defaultValue={getDefaultChoiceValue()}
-            disabled={options.disabled}
+            disabled={answerDisabled}
+            onChange={value => emitValueCompleteChange(value)}
           />
         );
 
       case QUESTION_COMPONENT_TYPE.IMAGE_MULTI_CHOICE:
         return (
           <ImageMultiChoice
+            ref={setAnswerRef}
             questionId={options.questionId}
             options={normalizeChoiceOptions().map(item => ({
               ...item,
               image: item.image || '',
             }))}
             defaultValue={getDefaultChoiceValues()}
-            disabled={options.disabled}
+            disabled={answerDisabled}
+            onChange={value => emitValueCompleteChange(value)}
           />
         );
 
       case QUESTION_COMPONENT_TYPE.TEXT_BLANK:
         return (
           <TextBlank
+            ref={setAnswerRef}
             questionId={options.questionId}
             placeholder={options.placeholder}
             defaultValue={getDefaultTextValue()}
-            disabled={options.disabled}
+            disabled={answerDisabled}
             maxlength={options.maxlength}
             rows={getTextBlankRows()}
             autoHeight={options.autoHeight}
+            onChange={value => emitValueCompleteChange(value)}
           />
         );
 
       case QUESTION_COMPONENT_TYPE.PHONE_BLANK:
         return (
           <PhoneBlank
+            ref={setAnswerRef}
             questionId={options.questionId}
             placeholder={options.placeholder}
             defaultValue={getDefaultTextValue()}
-            disabled={options.disabled}
+            disabled={answerDisabled}
             required={options.required}
             maxlength={options.maxlength}
             requiredMessage={options.requiredMessage}
             errorMessage={options.errorMessage}
+            onChange={(value, payload) => emitValueCompleteChange(value, payload.valid)}
           />
         );
 
       case QUESTION_COMPONENT_TYPE.EMAIL_BLANK:
         return (
           <EmailBlank
+            ref={setAnswerRef}
             questionId={options.questionId}
             placeholder={options.placeholder}
             defaultValue={getDefaultTextValue()}
-            disabled={options.disabled}
+            disabled={answerDisabled}
             required={options.required}
             maxlength={options.maxlength}
             requiredMessage={options.requiredMessage}
             errorMessage={options.errorMessage}
+            onChange={(value, payload) => emitValueCompleteChange(value, payload.valid)}
           />
         );
 
       case QUESTION_COMPONENT_TYPE.NUMBER_BLANK:
         return (
           <NumberBlank
+            ref={setAnswerRef}
             questionId={options.questionId}
             placeholder={options.placeholder}
             defaultValue={getDefaultTextValue()}
-            disabled={options.disabled}
+            disabled={answerDisabled}
             required={options.required}
             maxlength={options.maxlength}
             min={options.min}
@@ -279,38 +321,44 @@ const AnswerAreaList: React.FC<AnswerAreaListProps> = props => {
             errorMessage={options.errorMessage}
             minMessage={options.minMessage}
             maxMessage={options.maxMessage}
+            onChange={(value, payload) => emitValueCompleteChange(value, payload.valid)}
           />
         );
 
       case QUESTION_COMPONENT_TYPE.DATE_BLANK:
         return (
           <DateBlank
+            ref={setAnswerRef}
             questionId={options.questionId}
             placeholder={options.placeholder}
             defaultValue={getDefaultChoiceValue()?.toString() || null}
             mode={options.mode}
-            disabled={options.disabled}
+            disabled={answerDisabled}
             start={options.start}
             end={options.end}
             fields={options.fields}
+            onChange={value => emitValueCompleteChange(value)}
           />
         );
 
       case QUESTION_COMPONENT_TYPE.MULTI_BLANK:
         return (
           <MultiBlank
+            ref={setAnswerRef}
             questionId={options.questionId}
             items={options.items || []}
             placeholder={options.placeholder}
             defaultValue={getDefaultMultiBlankValue()}
-            disabled={options.disabled}
+            disabled={answerDisabled}
             maxlength={options.maxlength}
+            onChange={value => emitValueCompleteChange(value)}
           />
         );
 
       case QUESTION_COMPONENT_TYPE.IMAGE_DISPLAY:
         return (
           <ImageDisplay
+            ref={setAnswerRef}
             questionId={options.questionId}
             images={options.images || []}
             preview={options.preview}
@@ -320,6 +368,7 @@ const AnswerAreaList: React.FC<AnswerAreaListProps> = props => {
       case QUESTION_COMPONENT_TYPE.VIDEO_DISPLAY:
         return options.src || (options.videos && options.videos.length > 0) ? (
           <VideoDisplay
+            ref={setAnswerRef}
             questionId={options.questionId}
             videos={options.videos}
             src={options.src}
@@ -331,95 +380,113 @@ const AnswerAreaList: React.FC<AnswerAreaListProps> = props => {
       case QUESTION_COMPONENT_TYPE.RATING:
         return (
           <Rating
+            ref={setAnswerRef}
             questionId={options.questionId}
             options={normalizeRatingOptions()}
-            disabled={options.disabled}
+            disabled={answerDisabled}
+            onChange={value => emitValueCompleteChange(value)}
           />
         );
 
       case QUESTION_COMPONENT_TYPE.NPS:
         return (
           <NpsRating
+            ref={setAnswerRef}
             questionId={options.questionId}
             options={normalizeRatingOptions(0)}
             lowLabel={options.lowLabel}
             highLabel={options.highLabel}
-            disabled={options.disabled}
+            disabled={answerDisabled}
+            onChange={value => emitValueCompleteChange(value)}
           />
         );
 
       case QUESTION_COMPONENT_TYPE.BIDIRECTIONAL_RATING:
         return (
           <BidirectionalRating
+            ref={setAnswerRef}
             questionId={options.questionId}
             columns={normalizeMatrixRatingColumns()}
             leftLabel={options.leftLabel}
             rightLabel={options.rightLabel}
-            disabled={options.disabled}
+            disabled={answerDisabled}
+            onChange={value => emitValueCompleteChange(value)}
           />
         );
 
       case QUESTION_COMPONENT_TYPE.MULTI_RATING:
         return (
           <MultiRating
+            ref={setAnswerRef}
             questionId={options.questionId}
             rows={normalizeMatrixRows()}
             columns={normalizeMatrixRatingColumns()}
-            disabled={options.disabled}
+            disabled={answerDisabled}
+            onChange={value => emitValueCompleteChange(value)}
           />
         );
 
       case QUESTION_COMPONENT_TYPE.MULTI_BIDIRECTIONAL_RATING:
         return (
           <MultiBidirectionalRating
+            ref={setAnswerRef}
             questionId={options.questionId}
             rows={normalizeMatrixRows()}
             columns={normalizeMatrixRatingColumns()}
             leftLabel={options.leftLabel}
             rightLabel={options.rightLabel}
-            disabled={options.disabled}
+            disabled={answerDisabled}
+            onChange={value => emitValueCompleteChange(value)}
           />
         );
 
       case QUESTION_COMPONENT_TYPE.MATRIX_SINGLE_CHOICE:
         return (
           <MatrixSingleChoice
+            ref={setAnswerRef}
             questionId={options.questionId}
             rows={normalizeMatrixRows()}
             columns={normalizeMatrixColumns()}
-            disabled={options.disabled}
+            disabled={answerDisabled}
+            onChange={value => emitValueCompleteChange(value)}
           />
         );
 
       case QUESTION_COMPONENT_TYPE.MATRIX_MULTI_CHOICE:
         return (
           <MatrixMultiChoice
+            ref={setAnswerRef}
             questionId={options.questionId}
             rows={normalizeMatrixRows()}
             columns={normalizeMatrixColumns()}
-            disabled={options.disabled}
+            disabled={answerDisabled}
+            onChange={value => emitValueCompleteChange(value)}
           />
         );
 
       case QUESTION_COMPONENT_TYPE.MATRIX_RATING:
         return (
           <MatrixRating
+            ref={setAnswerRef}
             questionId={options.questionId}
             rows={normalizeMatrixRows()}
             columns={normalizeMatrixRatingColumns()}
-            disabled={options.disabled}
+            disabled={answerDisabled}
+            onChange={value => emitValueCompleteChange(value)}
           />
         );
 
       case QUESTION_COMPONENT_TYPE.MATRIX_BIDIRECTIONAL_RATING:
         return (
           <MatrixBidirectionalRating
+            ref={setAnswerRef}
             questionId={options.questionId}
             rows={normalizeMatrixRows()}
             columns={normalizeMatrixRatingColumns()}
             leftLabel={options.leftLabel}
             rightLabel={options.rightLabel}
-            disabled={options.disabled}
+            disabled={answerDisabled}
+            onChange={value => emitValueCompleteChange(value)}
           />
         );
     }
@@ -434,6 +501,8 @@ const AnswerAreaList: React.FC<AnswerAreaListProps> = props => {
       <View>{renderItem(options.type)}</View>
     </View>
   );
-};
+});
+
+AnswerAreaList.displayName = 'AnswerAreaList';
 
 export default AnswerAreaList;

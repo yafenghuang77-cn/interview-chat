@@ -1,38 +1,216 @@
-import React from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useLoad } from '@tarojs/taro';
 import { View, Button, ScrollView } from '@tarojs/components';
-import { resetDataList } from '@/store/interviewStore';
+import { QUESTION_COMPONENT_TYPE, type QuestionComponentType } from '@/common/constants';
+import {
+  queryCurrentInterviewQuestion,
+  resetInterviewFlow,
+  submitCurrentInterviewQuestion,
+  timeoutCurrentInterviewQuestion,
+} from '@/store/interviewStore';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import AnchorChat from './components/AnchorChat';
-import AnswerAreaList from './components/AnswerAreaList';
+import AnswerAreaList, { type AnswerAreaListRef } from './components/AnswerAreaList';
 import './index.less';
+
+const POLLING_INTERVAL = 2000;
+const DISPLAY_QUESTION_TYPES: QuestionComponentType[] = [
+  QUESTION_COMPONENT_TYPE.IMAGE_DISPLAY,
+  QUESTION_COMPONENT_TYPE.VIDEO_DISPLAY,
+];
 
 const InterviewPage: React.FC = () => {
   const dispatch = useAppDispatch();
   const dataList = useAppSelector(state => state.interview.dataList);
+  const currentQuestionId = useAppSelector(state => state.interview.currentQuestionId);
+  const isPollingPaused = useAppSelector(state => state.interview.isPollingPaused);
+  const isSubmitting = useAppSelector(state => state.interview.isSubmitting);
+  const isFinished = useAppSelector(state => state.interview.isFinished);
+  const submittedQuestionIds = useAppSelector(state => state.interview.submittedQuestionIds);
+  const answerAreaRefs = useRef<Record<string, AnswerAreaListRef | null>>({});
+  const [typingFinishedMap, setTypingFinishedMap] = useState<Record<number, boolean>>({});
+  const [answerCompleteMap, setAnswerCompleteMap] = useState<Record<string, boolean>>({});
+  const [visibleItemCount, setVisibleItemCount] = useState(0);
+  const visibleDataList = dataList.slice(0, visibleItemCount);
+  const currentItem = visibleDataList.find(item => item.config?.questionId === currentQuestionId);
+  const currentAnswerVisible = currentItem
+    ? Boolean(currentItem.config) && (!currentItem.content || typingFinishedMap[currentItem.id])
+    : false;
+  const isCurrentDisplayQuestion = currentItem?.config
+    ? DISPLAY_QUESTION_TYPES.includes(currentItem.config.type)
+    : false;
+  const currentAnswerComplete = currentQuestionId
+    ? Boolean(
+        answerCompleteMap[currentQuestionId] || (isCurrentDisplayQuestion && currentAnswerVisible),
+      )
+    : false;
+  const currentAnswerRefComplete = currentQuestionId
+    ? Boolean(answerAreaRefs.current[currentQuestionId]?.isComplete())
+    : false;
+  const submitDisabled =
+    !currentQuestionId || isSubmitting || !(currentAnswerComplete || currentAnswerRefComplete);
 
   useLoad(() => {
-    dispatch(resetDataList());
+    dispatch(resetInterviewFlow());
+    setTypingFinishedMap({});
+    setAnswerCompleteMap({});
+    setVisibleItemCount(0);
   });
 
-  const handleSubmit = () => {};
+  const pollCurrentQuestion = useCallback(() => {
+    dispatch(queryCurrentInterviewQuestion());
+  }, [dispatch]);
+
+  useEffect(() => {
+    if (isPollingPaused || isFinished) {
+      return undefined;
+    }
+
+    pollCurrentQuestion();
+
+    const timer = setInterval(pollCurrentQuestion, POLLING_INTERVAL);
+
+    return () => clearInterval(timer);
+  }, [isFinished, isPollingPaused, pollCurrentQuestion]);
+
+  useEffect(() => {
+    if (dataList.length === 0) {
+      setVisibleItemCount(0);
+      return;
+    }
+
+    setVisibleItemCount(currentCount => {
+      if (currentCount > 0 || dataList.length === 0) {
+        return currentCount;
+      }
+
+      return 1;
+    });
+  }, [dataList.length]);
+
+  useEffect(() => {
+    if (visibleItemCount <= 0 || visibleItemCount >= dataList.length) {
+      return;
+    }
+
+    const lastVisibleItem = dataList[visibleItemCount - 1];
+    const lastVisibleFinished = !lastVisibleItem.content || typingFinishedMap[lastVisibleItem.id];
+
+    if (!lastVisibleFinished) {
+      return;
+    }
+
+    setVisibleItemCount(currentCount => {
+      if (currentCount !== visibleItemCount || currentCount >= dataList.length) {
+        return currentCount;
+      }
+
+      return currentCount + 1;
+    });
+  }, [dataList, typingFinishedMap, visibleItemCount]);
+
+  const setAnswerAreaRef = useCallback(
+    (questionId: string) => (nextRef: AnswerAreaListRef | null) => {
+      answerAreaRefs.current[questionId] = nextRef;
+    },
+    [],
+  );
+
+  const handleSubmit = () => {
+    if (submitDisabled) {
+      return;
+    }
+
+    const submitValue = answerAreaRefs.current[currentQuestionId]?.getSubmitValue();
+
+    if (!submitValue) {
+      return;
+    }
+
+    dispatch(submitCurrentInterviewQuestion(submitValue));
+  };
+
+  const handleTypingFinish = useCallback((itemId: number) => {
+    setTypingFinishedMap(currentMap => {
+      if (currentMap[itemId]) {
+        return currentMap;
+      }
+
+      return {
+        ...currentMap,
+        [itemId]: true,
+      };
+    });
+  }, []);
+
+  const handleAnswerCompleteChange = useCallback((questionId: string, complete: boolean) => {
+    if (!questionId) {
+      return;
+    }
+
+    setAnswerCompleteMap(currentMap => {
+      if (currentMap[questionId] === complete) {
+        return currentMap;
+      }
+
+      return {
+        ...currentMap,
+        [questionId]: complete,
+      };
+    });
+  }, []);
+
+  const handleCountdownFinish = useCallback(
+    (questionId?: string) => {
+      if (!questionId) {
+        return;
+      }
+
+      dispatch(timeoutCurrentInterviewQuestion(questionId));
+    },
+    [dispatch],
+  );
 
   return (
     <View className="interview">
       <ScrollView className="interview_scroll" scrollY scrollWithAnimation>
         <View className="interview_answerList">
-          {dataList.map(item => {
+          {visibleDataList.map(item => {
+            const shouldShowAnswer =
+              Boolean(item.config) && (!item.content || typingFinishedMap[item.id]);
+            const questionId = item.config?.questionId;
+            const answerDisabled = questionId
+              ? questionId !== currentQuestionId ||
+                submittedQuestionIds.includes(questionId) ||
+                isSubmitting
+              : false;
+
             return (
               <View key={item.id} className="interview__round">
                 {item.content && item.content.length > 0 && (
                   <AnchorChat
                     content={item.content}
                     role={item.role}
-                    duration={item.duration || null}
+                    duration={
+                      item.config?.questionId === currentQuestionId ? item.duration || null : null
+                    }
+                    onCountdownFinish={
+                      item.config?.questionId === currentQuestionId
+                        ? () => handleCountdownFinish(item.config?.questionId)
+                        : undefined
+                    }
+                    onTypingFinish={() => handleTypingFinish(item.id)}
                   />
                 )}
-                {item?.config && Object.keys(item?.config).length > 0 && (
-                  <AnswerAreaList options={item.config} />
+                {shouldShowAnswer && item.config && Object.keys(item.config).length > 0 && (
+                  <AnswerAreaList
+                    ref={setAnswerAreaRef(item.config.questionId)}
+                    options={item.config}
+                    disabled={answerDisabled}
+                    onCompleteChange={complete =>
+                      handleAnswerCompleteChange(item.config?.questionId || '', complete)
+                    }
+                  />
                 )}
               </View>
             );
@@ -42,11 +220,15 @@ const InterviewPage: React.FC = () => {
       {/* 底部提交栏 */}
       <View className="interview_footer">
         <Button
-          className="interview_submit"
+          className={`interview_submit ${
+            submitDisabled ? 'interview_submit--disabled' : 'interview_submit--active'
+          }`}
           hoverClass="interview_submit--hover"
           onClick={handleSubmit}
+          loading={isSubmitting}
+          disabled={submitDisabled}
         >
-          提交
+          {isSubmitting ? '提交中' : '提交'}
         </Button>
       </View>
     </View>

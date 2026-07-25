@@ -1,7 +1,5 @@
-import { useEffect, useState } from 'react';
-
-export type CountdownTime = string | number | Date;
-export type CountdownDuration = [CountdownTime, CountdownTime];
+import { useEffect, useRef, useState } from 'react';
+import type { CountdownDuration, CountdownTime } from '../types';
 
 const SECOND = 1000;
 const SECONDS_PER_MINUTE = 60;
@@ -25,7 +23,7 @@ const toTimestamp = (value: CountdownTime): number => {
 
 const getRemainingMilliseconds = (
   startValue?: CountdownTime,
-  endValue?: CountdownTime
+  endValue?: CountdownTime,
 ): number | null => {
   if (startValue === undefined || endValue === undefined) {
     return null;
@@ -58,19 +56,25 @@ const formatRemainingMilliseconds = (remainingMilliseconds: number | null): stri
   return remainingMilliseconds === null ? '' : formatMilliseconds(remainingMilliseconds);
 };
 
-const getCountdownText = (
-  startValue?: CountdownTime,
-  endValue?: CountdownTime
-): string => {
+const getCountdownText = (startValue?: CountdownTime, endValue?: CountdownTime): string => {
   const remainingMilliseconds = getRemainingMilliseconds(startValue, endValue);
 
   return formatRemainingMilliseconds(remainingMilliseconds);
 };
 
-export const useCountdown = (duration?: CountdownDuration | null): string => {
+export const useCountdown = (
+  duration?: CountdownDuration | null,
+  onFinish?: () => void,
+): string => {
   const start = Array.isArray(duration) ? duration[0] : undefined;
   const end = Array.isArray(duration) ? duration[1] : undefined;
   const [countdown, setCountdown] = useState(() => getCountdownText(start, end));
+  const onFinishRef = useRef(onFinish);
+  const finishedRef = useRef(false);
+
+  useEffect(() => {
+    onFinishRef.current = onFinish;
+  }, [onFinish]);
 
   useEffect(() => {
     const updateCountdown = (): number | null => {
@@ -78,9 +82,15 @@ export const useCountdown = (duration?: CountdownDuration | null): string => {
 
       setCountdown(formatRemainingMilliseconds(remainingMilliseconds));
 
+      if (remainingMilliseconds !== null && remainingMilliseconds <= 0 && !finishedRef.current) {
+        finishedRef.current = true;
+        onFinishRef.current?.();
+      }
+
       return remainingMilliseconds;
     };
 
+    finishedRef.current = false;
     const remainingMilliseconds = updateCountdown();
     if (remainingMilliseconds === null || remainingMilliseconds <= 0) {
       return undefined;

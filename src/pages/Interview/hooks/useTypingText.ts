@@ -1,16 +1,23 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 const DEFAULT_TYPING_INTERVAL = 35;
 
 export const useTypingText = (
   text: string,
-  interval = DEFAULT_TYPING_INTERVAL
+  interval = DEFAULT_TYPING_INTERVAL,
+  onFinish?: () => void,
 ): string => {
   const [typingText, setTypingText] = useState('');
+  const onFinishRef = useRef(onFinish);
+
+  useEffect(() => {
+    onFinishRef.current = onFinish;
+  }, [onFinish]);
 
   useEffect(() => {
     if (!text) {
       setTypingText('');
+      onFinishRef.current?.();
       return undefined;
     }
 
@@ -25,6 +32,7 @@ export const useTypingText = (
 
       if (currentIndex >= chars.length) {
         clearInterval(timer);
+        onFinishRef.current?.();
       }
     }, interval);
 

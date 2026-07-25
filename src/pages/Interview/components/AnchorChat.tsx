@@ -1,7 +1,8 @@
 import React from 'react';
 import { Text, View } from '@tarojs/components';
-import { useCountdown, type CountdownDuration } from '../hooks/useCountdown';
+import { useCountdown } from '../hooks/useCountdown';
 import { useTypingText } from '../hooks/useTypingText';
+import type { CountdownDuration } from '../types';
 import './AnchorChat.less';
 
 interface AnchorChatProps {
@@ -9,12 +10,21 @@ interface AnchorChatProps {
   role?: string;
   content?: string;
   className?: string;
+  onCountdownFinish?: () => void;
+  onTypingFinish?: () => void;
 }
 
 const AnchorChat: React.FC<AnchorChatProps> = props => {
-  const { role = '', content = '', className = '', duration } = props;
-  const countdown = useCountdown(duration);
-  const typingContent = useTypingText(content);
+  const {
+    role = '',
+    content = '',
+    className = '',
+    duration,
+    onCountdownFinish,
+    onTypingFinish,
+  } = props;
+  const countdown = useCountdown(duration, onCountdownFinish);
+  const typingContent = useTypingText(content, undefined, onTypingFinish);
 
   return (
     <View className={`AnchorChat ${className}`}>
