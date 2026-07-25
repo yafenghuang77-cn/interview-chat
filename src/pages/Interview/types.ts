@@ -40,6 +40,8 @@ export type AnswerConfig = {
   options?: ChoiceOptionConfig[];
   placeholder?: string;
   defaultValue?: string | number | Array<string | number> | Record<string, unknown> | null;
+  completedAnswerCount?: number;
+  totalAnswerCount?: number;
   disabled?: boolean;
   required?: boolean;
   maxlength?: number;

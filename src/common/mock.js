@@ -2,6 +2,14 @@ import { QUESTION_COMPONENT_TYPE } from './constants';
 
 const now = Date.now();
 const minute = 60 * 1000;
+const SINGLE_USER_PROGRESS = {
+  completedAnswerCount: 1,
+  totalAnswerCount: 1,
+};
+const WAITING_USER_PROGRESS = {
+  completedAnswerCount: 1,
+  totalAnswerCount: 2,
+};
 
 /**
  * @typedef {import('../pages/Interview/hooks/useCountdown').CountdownDuration} CountdownDuration
@@ -43,6 +51,7 @@ const data = [
     content: '单选题',
     duration: createDuration(1),
     config: {
+      ...SINGLE_USER_PROGRESS,
       type: QUESTION_COMPONENT_TYPE.SINGLE_CHOICE,
       questionId: 'q1',
       questionText: '您目前的居住状态是？',
@@ -59,6 +68,7 @@ const data = [
     content: '多选题目',
     duration: createDuration(2),
     config: {
+      ...SINGLE_USER_PROGRESS,
       type: QUESTION_COMPONENT_TYPE.MULTI_CHOICE,
       questionId: 'q2',
       questionText: '平时您主要通过哪些方式放松？（可多选）',
@@ -76,6 +86,7 @@ const data = [
     content: '图片单选',
     duration: createDuration(1),
     config: {
+      ...SINGLE_USER_PROGRESS,
       type: QUESTION_COMPONENT_TYPE.IMAGE_SINGLE_CHOICE,
       questionId: 'q3',
       questionText: '下面哪张图最符合你此刻的心情？（图片单选）',
@@ -99,6 +110,7 @@ const data = [
     content: '图片多选',
     duration: createDuration(2),
     config: {
+      ...SINGLE_USER_PROGRESS,
       type: QUESTION_COMPONENT_TYPE.IMAGE_MULTI_CHOICE,
       questionId: 'q4',
       questionText: '你喜欢哪些口味？（图片多选）',
@@ -132,6 +144,7 @@ const data = [
     content: '文本填空',
     duration: createDuration(1),
     config: {
+      ...WAITING_USER_PROGRESS,
       type: QUESTION_COMPONENT_TYPE.TEXT_BLANK,
       questionId: 'q5',
       questionText: '请用一句话描述你最近印象最深的一次消费体验。',
@@ -145,6 +158,7 @@ const data = [
     content: '手机号',
     duration: createDuration(1),
     config: {
+      ...WAITING_USER_PROGRESS,
       type: QUESTION_COMPONENT_TYPE.PHONE_BLANK,
       questionId: 'q6',
       questionText: '请输入便于后续联系的手机号。',
@@ -161,6 +175,7 @@ const data = [
     content: '邮箱',
     duration: createDuration(1),
     config: {
+      ...WAITING_USER_PROGRESS,
       type: QUESTION_COMPONENT_TYPE.EMAIL_BLANK,
       questionId: 'q7',
       questionText: '请输入常用邮箱。',
@@ -177,6 +192,7 @@ const data = [
     content: '数值',
     duration: createDuration(1),
     config: {
+      ...WAITING_USER_PROGRESS,
       type: QUESTION_COMPONENT_TYPE.NUMBER_BLANK,
       questionId: 'q8',
       questionText: '你每周大约会花多少小时了解新产品？',
@@ -197,6 +213,7 @@ const data = [
     content: '日期',
     duration: createDuration(1),
     config: {
+      ...WAITING_USER_PROGRESS,
       type: QUESTION_COMPONENT_TYPE.DATE_BLANK,
       questionId: 'q9',
       questionText: '请选择你方便参加回访的日期时间。',
@@ -210,6 +227,7 @@ const data = [
     content: '多项填空',
     duration: createDuration(1),
     config: {
+      ...WAITING_USER_PROGRESS,
       type: QUESTION_COMPONENT_TYPE.MULTI_BLANK,
       questionId: 'q10',
       questionText: '请列出你最关注的 3 个产品特性。',
@@ -237,6 +255,7 @@ const data = [
     content: '图片展示',
     duration: createDuration(1),
     config: {
+      ...SINGLE_USER_PROGRESS,
       type: QUESTION_COMPONENT_TYPE.IMAGE_DISPLAY,
       questionId: 'q11',
       questionText: '下面是本次讨论会用到的参考图片。',
@@ -261,6 +280,7 @@ const data = [
     content: '视频展示',
     duration: createDuration(1),
     config: {
+      ...SINGLE_USER_PROGRESS,
       type: QUESTION_COMPONENT_TYPE.VIDEO_DISPLAY,
       questionId: 'q12',
       questionText: '请先观看这些参考视频。',
@@ -285,6 +305,7 @@ const data = [
     content: '餐饮体验满意度矩阵单选',
     duration: createDuration(2),
     config: {
+      ...SINGLE_USER_PROGRESS,
       type: QUESTION_COMPONENT_TYPE.MATRIX_SINGLE_CHOICE,
       questionId: 'q13',
       questionText: '结合最近一次到店或外卖消费体验，请评价下面各环节的满意程度。',
@@ -330,6 +351,7 @@ const data = [
     content: '不同用餐场景关注因素矩阵多选',
     duration: createDuration(2),
     config: {
+      ...SINGLE_USER_PROGRESS,
       type: QUESTION_COMPONENT_TYPE.MATRIX_MULTI_CHOICE,
       questionId: 'q14',
       questionText: '在下面这些用餐场景中，你通常会重点关注哪些因素？（每行可多选）',
@@ -371,6 +393,7 @@ const data = [
     content: '产品体验五分制矩阵打分',
     duration: createDuration(2),
     config: {
+      ...SINGLE_USER_PROGRESS,
       type: QUESTION_COMPONENT_TYPE.MATRIX_RATING,
       questionId: 'q15',
       questionText: '请按 1-5 分评价你对该品牌近期产品体验的感受，分数越高代表越认可。',
@@ -416,6 +439,7 @@ const data = [
     content: '品牌感知双向矩阵打分',
     duration: createDuration(2),
     config: {
+      ...SINGLE_USER_PROGRESS,
       type: QUESTION_COMPONENT_TYPE.MATRIX_BIDIRECTIONAL_RATING,
       questionId: 'q16',
       questionText: '下面每一项都有两种相反感受，请选择你认为更贴近该品牌的一侧，并用星级表示偏向强度。',
@@ -468,6 +492,7 @@ const data = [
     content: '整体满意度打分',
     duration: createDuration(1),
     config: {
+      ...SINGLE_USER_PROGRESS,
       type: QUESTION_COMPONENT_TYPE.RATING,
       questionId: 'q17',
       questionText: '请为你本次整体体验打分。',
@@ -486,6 +511,7 @@ const data = [
     content: 'NPS 推荐度',
     duration: createDuration(1),
     config: {
+      ...SINGLE_USER_PROGRESS,
       type: QUESTION_COMPONENT_TYPE.NPS,
       questionId: 'q18',
       questionText: '你有多大可能把这个品牌推荐给朋友或同事？',
@@ -512,6 +538,7 @@ const data = [
     content: '品牌气质双向打分',
     duration: createDuration(1),
     config: {
+      ...SINGLE_USER_PROGRESS,
       type: QUESTION_COMPONENT_TYPE.BIDIRECTIONAL_RATING,
       questionId: 'q19',
       questionText: '你觉得这个品牌整体更偏向哪种气质？请选择方向和强度。',
@@ -532,6 +559,7 @@ const data = [
     content: '门店体验多项打分',
     duration: createDuration(2),
     config: {
+      ...SINGLE_USER_PROGRESS,
       type: QUESTION_COMPONENT_TYPE.MULTI_RATING,
       questionId: 'q20',
       questionText: '请分别评价这次门店体验中的几个具体环节。',
@@ -572,6 +600,7 @@ const data = [
     content: '品牌感知多项双向打分',
     duration: createDuration(2),
     config: {
+      ...SINGLE_USER_PROGRESS,
       type: QUESTION_COMPONENT_TYPE.MULTI_BIDIRECTIONAL_RATING,
       questionId: 'q21',
       questionText: '下面每一项都有两端描述，请选择更贴近你感受的一侧，并标记偏向强度。',

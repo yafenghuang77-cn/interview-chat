@@ -1,0 +1,165 @@
+@primary: #07c160;
+@primary-light: #f3ffec;
+@primary-border: #9cec77;
+@text: #222222;
+@text-weak: #9a9a9a;
+@card-bg: #f6f6f6;
+
+.interviewWaiting {
+  min-height: 100vh;
+  box-sizing: border-box;
+  padding: 128px 40px 0;
+  background: #ffffff;
+
+  &_header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  &_loading {
+    width: 132px;
+    height: 132px;
+    box-sizing: border-box;
+    border: 7px solid transparent;
+    border-top-color: @primary;
+    border-right-color: @primary;
+    border-radius: 50%;
+    animation: interviewWaitingSpin 1.1s linear infinite;
+  }
+
+  &_title {
+    margin-top: 42px;
+    color: @text;
+    font-size: 34px;
+    line-height: 48px;
+    font-weight: 700;
+  }
+
+  &_subtitle {
+    margin-top: 14px;
+    color: @text-weak;
+    font-size: 28px;
+    line-height: 40px;
+  }
+
+  &_progressCard {
+    margin-top: 122px;
+    padding: 40px;
+    box-sizing: border-box;
+    border-radius: 20px;
+    background: @card-bg;
+  }
+
+  &_progressLabel {
+    color: @text-weak;
+    font-size: 28px;
+    line-height: 40px;
+  }
+
+  &_countLine {
+    display: flex;
+    align-items: baseline;
+    margin-top: 22px;
+  }
+
+  &_countStrong {
+    color: @primary;
+    font-size: 48px;
+    line-height: 60px;
+    font-weight: 700;
+  }
+
+  &_countText {
+    color: @text-weak;
+    font-size: 28px;
+    line-height: 40px;
+    font-weight: 700;
+  }
+
+  &_progressTrack {
+    width: 100%;
+    height: 14px;
+    margin-top: 24px;
+    overflow: hidden;
+    border-radius: 999px;
+    background: #ffffff;
+  }
+
+  &_progressBar {
+    height: 100%;
+    border-radius: inherit;
+    background: @primary;
+  }
+
+  &_tip {
+    height: 86px;
+    margin-top: 34px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    border: 1px solid @primary-border;
+    border-radius: 12px;
+    background: @primary-light;
+  }
+
+  &_stopwatch {
+    position: relative;
+    width: 28px;
+    height: 28px;
+    box-sizing: border-box;
+    border: 4px solid @primary;
+    border-radius: 50%;
+  }
+
+  &_stopwatch::before {
+    content: '';
+    position: absolute;
+    top: 4px;
+    left: 11px;
+    width: 4px;
+    height: 9px;
+    border-radius: 999px;
+    background: @primary;
+  }
+
+  &_stopwatch::after {
+    content: '';
+    position: absolute;
+    top: 11px;
+    left: 11px;
+    width: 8px;
+    height: 4px;
+    border-radius: 999px;
+    background: @primary;
+  }
+
+  &_stopwatchTop {
+    position: absolute;
+    top: -10px;
+    left: 7px;
+    width: 10px;
+    height: 6px;
+    border-radius: 999px;
+    background: @primary;
+  }
+
+  &_tipText {
+    margin-left: 12px;
+    color: #4fbe2f;
+    font-size: 26px;
+    line-height: 38px;
+    font-weight: 600;
+  }
+}
+
+@keyframes interviewWaitingSpin {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}

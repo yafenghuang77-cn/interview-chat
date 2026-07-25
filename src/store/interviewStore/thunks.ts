@@ -1,5 +1,6 @@
+import Taro from '@tarojs/taro';
 import { getCurrentSurveyQuestion, submitSurveyQuestion } from '@/api/InterviewApi';
-import type { InterviewAnswerSubmitValue } from '@/pages/Interview/types';
+import type { AnswerConfig, InterviewAnswerSubmitValue } from '@/pages/Interview/types';
 import type { AppDispatch, RootState } from '@/store';
 import {
   cancelSubmitCurrentQuestion,
@@ -12,6 +13,32 @@ import {
   saveInterviewAnswer,
   startSubmitCurrentQuestion,
 } from './slice';
+
+const getSubmittedQuestionConfig = (
+  state: RootState['interview'],
+  questionId: string,
+): AnswerConfig | null =>
+  state.dataList.find(item => item.config?.questionId === questionId)?.config || null;
+
+const shouldShowMockWaitingPage = (config?: AnswerConfig | null): config is AnswerConfig => {
+  const completedAnswerCount = Number(config?.completedAnswerCount);
+  const totalAnswerCount = Number(config?.totalAnswerCount);
+
+  return (
+    Number.isFinite(completedAnswerCount) &&
+    Number.isFinite(totalAnswerCount) &&
+    completedAnswerCount < totalAnswerCount
+  );
+};
+
+const navigateToMockWaitingPage = (surveyId: string, config: AnswerConfig): void => {
+  Taro.redirectTo({
+    url:
+      `/pages/InterviewWaiting/index?surveyId=${encodeURIComponent(surveyId)}` +
+      `&completed=${Number(config.completedAnswerCount)}` +
+      `&total=${Number(config.totalAnswerCount)}`,
+  });
+};
 
 export const resetInterviewFlow =
   (surveyId: string) =>
@@ -59,7 +86,18 @@ export const submitCurrentInterviewQuestion =
     const response = await submitSurveyQuestion(answer);
 
     if (response.code === 1) {
+      const latestState = getState().interview;
+      const submittedConfig = getSubmittedQuestionConfig(latestState, answer.questionId);
+
       dispatch(finishSubmitCurrentQuestion(answer.questionId));
+
+      // mock 专用跳转逻辑：当前题提交后，如果题目配置里还有其他用户没完成，
+      // 先进入等待页展示追问进度；真实后端接入时只需要替换这里的判断来源。
+      if (shouldShowMockWaitingPage(submittedConfig)) {
+        navigateToMockWaitingPage(latestState.surveyId, submittedConfig);
+        return true;
+      }
+
       // 提交完成立即补拉下一条，减少“提交成功但还没轮询到下一题”时用户切走导致的空窗。
       dispatch(queryCurrentInterviewQuestion());
       return true;
