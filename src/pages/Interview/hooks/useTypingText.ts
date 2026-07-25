@@ -6,6 +6,7 @@ export const useTypingText = (
   text: string,
   interval = DEFAULT_TYPING_INTERVAL,
   onFinish?: () => void,
+  skip = false,
 ): string => {
   const [typingText, setTypingText] = useState('');
   const onFinishRef = useRef(onFinish);
@@ -15,6 +16,12 @@ export const useTypingText = (
   }, [onFinish]);
 
   useEffect(() => {
+    if (skip) {
+      setTypingText(text);
+      onFinishRef.current?.();
+      return undefined;
+    }
+
     if (!text) {
       setTypingText('');
       onFinishRef.current?.();
@@ -37,7 +44,7 @@ export const useTypingText = (
     }, interval);
 
     return () => clearInterval(timer);
-  }, [text, interval]);
+  }, [text, interval, skip]);
 
   return typingText;
 };

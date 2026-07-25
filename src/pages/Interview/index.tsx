@@ -1,8 +1,9 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { useLoad } from '@tarojs/taro';
+import { useLoad, useRouter } from '@tarojs/taro';
 import { View, Button, ScrollView } from '@tarojs/components';
 import { QUESTION_COMPONENT_TYPE, type QuestionComponentType } from '@/common/constants';
 import {
+  persistInterviewAnswer,
   queryCurrentInterviewQuestion,
   resetInterviewFlow,
   submitCurrentInterviewQuestion,
@@ -11,6 +12,7 @@ import {
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import AnchorChat from './components/AnchorChat';
 import AnswerAreaList, { type AnswerAreaListRef } from './components/AnswerAreaList';
+import type { InterviewAnswerSubmitValue } from './types';
 import './index.less';
 
 const POLLING_INTERVAL = 2000;
@@ -20,14 +22,19 @@ const DISPLAY_QUESTION_TYPES: QuestionComponentType[] = [
 ];
 
 const InterviewPage: React.FC = () => {
+  const router = useRouter();
+  const surveyId = String(router.params?.surveyId || 'default-survey');
   const dispatch = useAppDispatch();
   const dataList = useAppSelector(state => state.interview.dataList);
   const currentQuestionId = useAppSelector(state => state.interview.currentQuestionId);
   const isPollingPaused = useAppSelector(state => state.interview.isPollingPaused);
   const isSubmitting = useAppSelector(state => state.interview.isSubmitting);
   const isFinished = useAppSelector(state => state.interview.isFinished);
+  const restoredFromCache = useAppSelector(state => state.interview.restoredFromCache);
+  const cachedItemIds = useAppSelector(state => state.interview.cachedItemIds);
   const submittedQuestionIds = useAppSelector(state => state.interview.submittedQuestionIds);
   const answerAreaRefs = useRef<Record<string, AnswerAreaListRef | null>>({});
+  const cacheRenderInitializedRef = useRef(false);
   const [typingFinishedMap, setTypingFinishedMap] = useState<Record<number, boolean>>({});
   const [answerCompleteMap, setAnswerCompleteMap] = useState<Record<string, boolean>>({});
   const [visibleItemCount, setVisibleItemCount] = useState(0);
@@ -51,11 +58,32 @@ const InterviewPage: React.FC = () => {
     !currentQuestionId || isSubmitting || !(currentAnswerComplete || currentAnswerRefComplete);
 
   useLoad(() => {
-    dispatch(resetInterviewFlow());
+    cacheRenderInitializedRef.current = false;
+    dispatch(resetInterviewFlow(surveyId));
     setTypingFinishedMap({});
     setAnswerCompleteMap({});
     setVisibleItemCount(0);
   });
+
+  useEffect(() => {
+    if (!restoredFromCache || cachedItemIds.length === 0 || cacheRenderInitializedRef.current) {
+      return;
+    }
+
+    cacheRenderInitializedRef.current = true;
+    setVisibleItemCount(cachedItemIds.length);
+    setTypingFinishedMap(currentMap => {
+      const cachedIdSet = new Set(cachedItemIds);
+
+      return dataList.reduce<Record<number, boolean>>((finishedMap, item) => {
+        if (item.content && cachedIdSet.has(item.id)) {
+          finishedMap[item.id] = true;
+        }
+
+        return finishedMap;
+      }, currentMap);
+    });
+  }, [cachedItemIds, dataList, restoredFromCache]);
 
   const pollCurrentQuestion = useCallback(() => {
     dispatch(queryCurrentInterviewQuestion());
@@ -160,6 +188,14 @@ const InterviewPage: React.FC = () => {
     });
   }, []);
 
+  const handleAnswerChange = useCallback(
+    (answer: InterviewAnswerSubmitValue, complete: boolean) => {
+      dispatch(persistInterviewAnswer(answer));
+      handleAnswerCompleteChange(answer.questionId, complete);
+    },
+    [dispatch, handleAnswerCompleteChange],
+  );
+
   const handleCountdownFinish = useCallback(
     (questionId?: string) => {
       if (!questionId) {
@@ -191,6 +227,7 @@ const InterviewPage: React.FC = () => {
                   <AnchorChat
                     content={item.content}
                     role={item.role}
+                    skipTyping={cachedItemIds.includes(item.id)}
                     duration={
                       item.config?.questionId === currentQuestionId ? item.duration || null : null
                     }
@@ -207,6 +244,7 @@ const InterviewPage: React.FC = () => {
                     ref={setAnswerAreaRef(item.config.questionId)}
                     options={item.config}
                     disabled={answerDisabled}
+                    onAnswerChange={handleAnswerChange}
                     onCompleteChange={complete =>
                       handleAnswerCompleteChange(item.config?.questionId || '', complete)
                     }

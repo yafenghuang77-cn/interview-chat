@@ -39,7 +39,7 @@ export type AnswerConfig = {
   description?: string;
   options?: ChoiceOptionConfig[];
   placeholder?: string;
-  defaultValue?: string | number | Array<string | number> | null;
+  defaultValue?: string | number | Array<string | number> | Record<string, unknown> | null;
   disabled?: boolean;
   required?: boolean;
   maxlength?: number;

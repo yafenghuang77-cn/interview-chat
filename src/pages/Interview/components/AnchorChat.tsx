@@ -10,6 +10,7 @@ interface AnchorChatProps {
   role?: string;
   content?: string;
   className?: string;
+  skipTyping?: boolean;
   onCountdownFinish?: () => void;
   onTypingFinish?: () => void;
 }
@@ -20,11 +21,12 @@ const AnchorChat: React.FC<AnchorChatProps> = props => {
     content = '',
     className = '',
     duration,
+    skipTyping = false,
     onCountdownFinish,
     onTypingFinish,
   } = props;
   const countdown = useCountdown(duration, onCountdownFinish);
-  const typingContent = useTypingText(content, undefined, onTypingFinish);
+  const typingContent = useTypingText(content, undefined, onTypingFinish, skipTyping);
 
   return (
     <View className={`AnchorChat ${className}`}>

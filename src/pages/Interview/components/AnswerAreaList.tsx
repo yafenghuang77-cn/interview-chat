@@ -39,11 +39,12 @@ type AnswerComponentRef = {
 interface AnswerAreaListProps {
   options: AnswerConfig;
   disabled?: boolean;
+  onAnswerChange?: (answer: InterviewAnswerSubmitValue, complete: boolean) => void;
   onCompleteChange?: (complete: boolean) => void;
 }
 
 const AnswerAreaList = React.forwardRef<AnswerAreaListRef, AnswerAreaListProps>((props, ref) => {
-  const { options, disabled = false, onCompleteChange } = props;
+  const { options, disabled = false, onAnswerChange, onCompleteChange } = props;
   const answerDisabled = disabled || Boolean(options.disabled);
   const answerRef = React.useRef<AnswerComponentRef | null>(null);
   const setAnswerRef = React.useCallback((nextRef: AnswerComponentRef | null) => {
@@ -118,9 +119,16 @@ const AnswerAreaList = React.forwardRef<AnswerAreaListRef, AnswerAreaListProps>(
 
   const emitValueCompleteChange = React.useCallback(
     (value: unknown, valid = true) => {
-      onCompleteChange?.(valid && isAnswerValueComplete(value));
+      const complete = valid && isAnswerValueComplete(value);
+      const answer = {
+        questionId: options.questionId,
+        value,
+      };
+
+      onAnswerChange?.(answer, complete);
+      onCompleteChange?.(complete);
     },
-    [isAnswerValueComplete, onCompleteChange],
+    [isAnswerValueComplete, onAnswerChange, onCompleteChange, options.questionId],
   );
 
   const emitCurrentCompleteChange = React.useCallback(() => {
@@ -149,10 +157,11 @@ const AnswerAreaList = React.forwardRef<AnswerAreaListRef, AnswerAreaListProps>(
   const getDefaultTextValue = (): string =>
     typeof options.defaultValue === 'string' ? options.defaultValue : '';
 
-  const getDefaultChoiceValue = (): string | number | null =>
-    typeof options.defaultValue === 'string' || typeof options.defaultValue === 'number'
+  const getDefaultChoiceValue = (): string | number | null => {
+    return typeof options.defaultValue === 'string' || typeof options.defaultValue === 'number'
       ? options.defaultValue
       : null;
+  };
 
   const getDefaultChoiceValues = (): Array<string | number> =>
     Array.isArray(options.defaultValue) ? options.defaultValue : [];
@@ -160,6 +169,13 @@ const AnswerAreaList = React.forwardRef<AnswerAreaListRef, AnswerAreaListProps>(
   const getDefaultMultiBlankValue = (): string[] | undefined =>
     Array.isArray(options.defaultValue)
       ? options.defaultValue.map(item => String(item))
+      : undefined;
+
+  const getDefaultObjectValue = <T extends object>(): T | undefined =>
+    options.defaultValue &&
+    typeof options.defaultValue === 'object' &&
+    !Array.isArray(options.defaultValue)
+      ? (options.defaultValue as T)
       : undefined;
 
   const getTextBlankRows = (): number | undefined =>
@@ -383,6 +399,7 @@ const AnswerAreaList = React.forwardRef<AnswerAreaListRef, AnswerAreaListProps>(
             ref={setAnswerRef}
             questionId={options.questionId}
             options={normalizeRatingOptions()}
+            defaultValue={typeof options.defaultValue === 'number' ? options.defaultValue : null}
             disabled={answerDisabled}
             onChange={value => emitValueCompleteChange(value)}
           />
@@ -396,6 +413,7 @@ const AnswerAreaList = React.forwardRef<AnswerAreaListRef, AnswerAreaListProps>(
             options={normalizeRatingOptions(0)}
             lowLabel={options.lowLabel}
             highLabel={options.highLabel}
+            defaultValue={typeof options.defaultValue === 'number' ? options.defaultValue : null}
             disabled={answerDisabled}
             onChange={value => emitValueCompleteChange(value)}
           />
@@ -409,6 +427,7 @@ const AnswerAreaList = React.forwardRef<AnswerAreaListRef, AnswerAreaListProps>(
             columns={normalizeMatrixRatingColumns()}
             leftLabel={options.leftLabel}
             rightLabel={options.rightLabel}
+            defaultValue={getDefaultObjectValue()}
             disabled={answerDisabled}
             onChange={value => emitValueCompleteChange(value)}
           />
@@ -421,6 +440,7 @@ const AnswerAreaList = React.forwardRef<AnswerAreaListRef, AnswerAreaListProps>(
             questionId={options.questionId}
             rows={normalizeMatrixRows()}
             columns={normalizeMatrixRatingColumns()}
+            defaultValue={getDefaultObjectValue()}
             disabled={answerDisabled}
             onChange={value => emitValueCompleteChange(value)}
           />
@@ -435,6 +455,7 @@ const AnswerAreaList = React.forwardRef<AnswerAreaListRef, AnswerAreaListProps>(
             columns={normalizeMatrixRatingColumns()}
             leftLabel={options.leftLabel}
             rightLabel={options.rightLabel}
+            defaultValue={getDefaultObjectValue()}
             disabled={answerDisabled}
             onChange={value => emitValueCompleteChange(value)}
           />
@@ -447,6 +468,7 @@ const AnswerAreaList = React.forwardRef<AnswerAreaListRef, AnswerAreaListProps>(
             questionId={options.questionId}
             rows={normalizeMatrixRows()}
             columns={normalizeMatrixColumns()}
+            defaultValue={getDefaultObjectValue()}
             disabled={answerDisabled}
             onChange={value => emitValueCompleteChange(value)}
           />
@@ -459,6 +481,7 @@ const AnswerAreaList = React.forwardRef<AnswerAreaListRef, AnswerAreaListProps>(
             questionId={options.questionId}
             rows={normalizeMatrixRows()}
             columns={normalizeMatrixColumns()}
+            defaultValue={getDefaultObjectValue()}
             disabled={answerDisabled}
             onChange={value => emitValueCompleteChange(value)}
           />
@@ -471,6 +494,7 @@ const AnswerAreaList = React.forwardRef<AnswerAreaListRef, AnswerAreaListProps>(
             questionId={options.questionId}
             rows={normalizeMatrixRows()}
             columns={normalizeMatrixRatingColumns()}
+            defaultValue={getDefaultObjectValue()}
             disabled={answerDisabled}
             onChange={value => emitValueCompleteChange(value)}
           />
@@ -485,6 +509,7 @@ const AnswerAreaList = React.forwardRef<AnswerAreaListRef, AnswerAreaListProps>(
             columns={normalizeMatrixRatingColumns()}
             leftLabel={options.leftLabel}
             rightLabel={options.rightLabel}
+            defaultValue={getDefaultObjectValue()}
             disabled={answerDisabled}
             onChange={value => emitValueCompleteChange(value)}
           />

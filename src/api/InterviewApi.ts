@@ -62,6 +62,10 @@ export type CurrentSurveyQuestionResponse = {
   hasMore: boolean;
 };
 
+export type CurrentSurveyQuestionParams = {
+  reset?: boolean;
+};
+
 export type SubmitSurveyQuestionParams = InterviewAnswerSubmitValue & {
   submitType?: 'answer' | 'timeout';
 };
@@ -77,8 +81,13 @@ const resetMockSurveyProgress = (): void => {
   durationByItemId = new Map<number, InterviewItem['duration']>();
 };
 
-export const getCurrentSurveyQuestion = (reset = false): CurrentSurveyQuestionResponse => {
-  if (reset) {
+const getQuestionItemIndex = (questionId: string): number =>
+  mockInterviewData.findIndex(item => item.config?.questionId === questionId);
+
+export const getCurrentSurveyQuestion = (
+  params: CurrentSurveyQuestionParams = {},
+): CurrentSurveyQuestionResponse => {
+  if (params.reset) {
     resetMockSurveyProgress();
   }
 
@@ -111,7 +120,16 @@ export const submitSurveyQuestion = async (
 ): Promise<SubmitSurveyQuestionResponse> => {
   await wait(MOCK_SUBMIT_DELAY);
 
-  const currentItem = mockInterviewData[currentIndex];
+  const questionIndex = getQuestionItemIndex(params.questionId);
+
+  if (questionIndex < 0) {
+    return {
+      code: 0,
+      message: '提交题目不存在',
+    };
+  }
+
+  const currentItem = mockInterviewData[questionIndex];
 
   if (!currentItem?.config) {
     return {
@@ -120,13 +138,7 @@ export const submitSurveyQuestion = async (
     };
   }
 
-  if (currentItem.config.questionId !== params.questionId) {
-    return {
-      code: 0,
-      message: '提交题目与当前题目不一致',
-    };
-  }
-
+  currentIndex = questionIndex;
   submittedQuestionIds.add(params.questionId);
   goNextSurveyQuestion();
 

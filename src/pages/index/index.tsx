@@ -14,7 +14,7 @@ export default function Index() {
         type="primary"
         onClick={() => {
           Taro.navigateTo({
-            url: '/pages/Interview/index',
+            url: '/pages/Interview/index?surveyId=mock-survey-001',
           });
         }}
       >
