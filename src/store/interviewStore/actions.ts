@@ -1,4 +1,5 @@
 import Taro from '@tarojs/taro';
+
 import { getCurrentSurveyQuestion, submitSurveyQuestion } from '@/api/InterviewApi';
 import type { AnswerConfig, InterviewAnswerSubmitValue } from '@/pages/Interview/types';
 import type { AppDispatch, RootState } from '@/store';
@@ -13,12 +14,11 @@ import {
   saveInterviewAnswer,
   startSubmitCurrentQuestion,
 } from './slice';
-
-const getSubmittedQuestionConfig = (
-  state: RootState['interview'],
-  questionId: string,
-): AnswerConfig | null =>
-  state.dataList.find(item => item.config?.questionId === questionId)?.config || null;
+import {
+  selectInterviewDataList,
+  selectInterviewQuestionConfigById,
+  selectInterviewState,
+} from './selectors';
 
 const shouldShowMockWaitingPage = (config?: AnswerConfig | null): config is AnswerConfig => {
   const completedAnswerCount = Number(config?.completedAnswerCount);
@@ -47,7 +47,7 @@ export const resetInterviewFlow =
     dispatch(resetInterviewState(surveyId));
 
     // 有缓存说明 Redux 已经恢复出完整页面 list，首页再次进入时不用再调 mock 重置流程。
-    if (getState().interview.dataList.length > 0) {
+    if (selectInterviewDataList(getState()).length > 0) {
       return;
     }
 
@@ -58,7 +58,7 @@ export const resetInterviewFlow =
 export const queryCurrentInterviewQuestion =
   () =>
   (dispatch: AppDispatch, getState: () => RootState): void => {
-    const { currentQuestionId, isSubmitting } = getState().interview;
+    const { currentQuestionId, isSubmitting } = selectInterviewState(getState());
 
     // 页面层每 2 秒触发一次查询，但 Redux 只允许“没有正在作答的题目”时真正请求下一条。
     // 当前题还没提交/超时时继续查询，容易把后续题和当前题抢到同一个渲染队列里，
@@ -75,7 +75,7 @@ export const queryCurrentInterviewQuestion =
 export const submitCurrentInterviewQuestion =
   (answer: InterviewAnswerSubmitValue) =>
   async (dispatch: AppDispatch, getState: () => RootState): Promise<boolean> => {
-    const { currentQuestionId, isSubmitting } = getState().interview;
+    const { currentQuestionId, isSubmitting } = selectInterviewState(getState());
 
     if (isSubmitting || !currentQuestionId || currentQuestionId !== answer.questionId) {
       return false;
@@ -87,15 +87,16 @@ export const submitCurrentInterviewQuestion =
     const response = await submitSurveyQuestion(answer);
 
     if (response.code === 1) {
-      const latestState = getState().interview;
-      const submittedConfig = getSubmittedQuestionConfig(latestState, answer.questionId);
+      const latestState = getState();
+      const submittedConfig = selectInterviewQuestionConfigById(latestState, answer.questionId);
+      const { surveyId } = selectInterviewState(latestState);
 
       dispatch(finishSubmitCurrentQuestion(answer.questionId));
 
       // mock 专用跳转逻辑：当前题提交后，如果题目配置里还有其他用户没完成，
       // 先进入等待页展示追问进度；真实后端接入时只需要替换这里的判断来源。
       if (shouldShowMockWaitingPage(submittedConfig)) {
-        navigateToMockWaitingPage(latestState.surveyId, submittedConfig);
+        navigateToMockWaitingPage(surveyId, submittedConfig);
         return true;
       }
 
@@ -111,7 +112,9 @@ export const submitCurrentInterviewQuestion =
 export const timeoutCurrentInterviewQuestion =
   (questionId: string) =>
   async (dispatch: AppDispatch, getState: () => RootState): Promise<boolean> => {
-    const { currentQuestionId, isSubmitting, submittedQuestionIds } = getState().interview;
+    const { currentQuestionId, isSubmitting, submittedQuestionIds } = selectInterviewState(
+      getState(),
+    );
 
     if (
       isSubmitting ||
@@ -144,7 +147,7 @@ export const timeoutCurrentInterviewQuestion =
 export const persistInterviewAnswer =
   (answer: InterviewAnswerSubmitValue) =>
   (dispatch: AppDispatch, getState: () => RootState): boolean => {
-    const { currentQuestionId } = getState().interview;
+    const { currentQuestionId } = selectInterviewState(getState());
 
     if (!currentQuestionId || currentQuestionId !== answer.questionId) {
       return false;
@@ -154,3 +157,15 @@ export const persistInterviewAnswer =
     dispatch(saveInterviewAnswer(answer));
     return true;
   };
+
+export {
+  cancelSubmitCurrentQuestion,
+  finishSubmitCurrentQuestion,
+  markCurrentQuestionTimeout,
+  pauseInterviewPolling,
+  receiveCurrentInterviewItem,
+  resetInterviewState,
+  resumeInterviewPolling,
+  saveInterviewAnswer,
+  startSubmitCurrentQuestion,
+};

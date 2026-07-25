@@ -6,6 +6,14 @@ import {
   persistInterviewAnswer,
   queryCurrentInterviewQuestion,
   resetInterviewFlow,
+  selectInterviewCachedItemIds,
+  selectInterviewCurrentQuestionId,
+  selectInterviewDataList,
+  selectInterviewIsFinished,
+  selectInterviewIsPollingPaused,
+  selectInterviewIsSubmitting,
+  selectInterviewRestoredFromCache,
+  selectInterviewSubmittedQuestionIds,
   submitCurrentInterviewQuestion,
   timeoutCurrentInterviewQuestion,
 } from '@/store/interviewStore';
@@ -27,14 +35,14 @@ const InterviewPage: React.FC = () => {
   const router = useRouter();
   const surveyId = String(router.params?.surveyId || 'default-survey');
   const dispatch = useAppDispatch();
-  const dataList = useAppSelector(state => state.interview.dataList);
-  const currentQuestionId = useAppSelector(state => state.interview.currentQuestionId);
-  const isPollingPaused = useAppSelector(state => state.interview.isPollingPaused);
-  const isSubmitting = useAppSelector(state => state.interview.isSubmitting);
-  const isFinished = useAppSelector(state => state.interview.isFinished);
-  const restoredFromCache = useAppSelector(state => state.interview.restoredFromCache);
-  const cachedItemIds = useAppSelector(state => state.interview.cachedItemIds);
-  const submittedQuestionIds = useAppSelector(state => state.interview.submittedQuestionIds);
+  const dataList = useAppSelector(selectInterviewDataList);
+  const currentQuestionId = useAppSelector(selectInterviewCurrentQuestionId);
+  const isPollingPaused = useAppSelector(selectInterviewIsPollingPaused);
+  const isSubmitting = useAppSelector(selectInterviewIsSubmitting);
+  const isFinished = useAppSelector(selectInterviewIsFinished);
+  const restoredFromCache = useAppSelector(selectInterviewRestoredFromCache);
+  const cachedItemIds = useAppSelector(selectInterviewCachedItemIds);
+  const submittedQuestionIds = useAppSelector(selectInterviewSubmittedQuestionIds);
   const answerAreaRefs = useRef<Record<string, AnswerAreaListRef | null>>({});
   const cacheRenderInitializedRef = useRef(false);
   const pollingTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);

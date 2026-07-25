@@ -3,19 +3,29 @@ export {
   finishSubmitCurrentQuestion,
   markCurrentQuestionTimeout,
   pauseInterviewPolling,
+  persistInterviewAnswer,
+  queryCurrentInterviewQuestion,
   receiveCurrentInterviewItem,
   resetInterviewState,
+  resetInterviewFlow,
   resumeInterviewPolling,
   saveInterviewAnswer,
   startSubmitCurrentQuestion,
-} from './slice';
-export {
-  persistInterviewAnswer,
-  queryCurrentInterviewQuestion,
-  resetInterviewFlow,
   submitCurrentInterviewQuestion,
   timeoutCurrentInterviewQuestion,
-} from './thunks';
+} from './actions';
+export {
+  selectInterviewCachedItemIds,
+  selectInterviewCurrentQuestionId,
+  selectInterviewDataList,
+  selectInterviewIsFinished,
+  selectInterviewIsPollingPaused,
+  selectInterviewIsSubmitting,
+  selectInterviewQuestionConfigById,
+  selectInterviewRestoredFromCache,
+  selectInterviewState,
+  selectInterviewSubmittedQuestionIds,
+} from './selectors';
 export type { InterviewState } from './types';
 export type { InterviewItem } from '@/pages/Interview/types';
 export { default } from './slice';

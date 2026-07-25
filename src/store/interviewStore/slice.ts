@@ -1,17 +1,51 @@
 import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
 
-import { getInterviewDraft } from '@/pages/Interview/persistence';
-import type { InterviewAnswerSubmitValue, InterviewItem } from '@/pages/Interview/types';
-import {
-  fillAnswerIntoDataList,
-  getQuestionId,
-  initialState,
-  writeInterviewDraft,
-} from './helpers';
+import { getInterviewDraft, setInterviewDraft } from '@/pages/Interview/persistence';
+import type {
+  AnswerConfig,
+  InterviewAnswerSubmitValue,
+  InterviewItem,
+} from '@/pages/Interview/types';
+import { initialInterviewState, INTERVIEW_SLICE_NAME } from './constants';
+import type { InterviewState } from './types';
+
+const getQuestionId = (item?: InterviewItem | null): string | null =>
+  item?.config?.questionId || null;
+
+const writeInterviewDraft = (state: InterviewState): void => {
+  if (!state.surveyId) {
+    return;
+  }
+
+  // 持久化只在 Redux 收口：API mock 不接收缓存参数，后续接后端也只需要替换接口层。
+  // 这里保存整份 dataList，是为了用户切出去再回来时能恢复完整页面、已填答案和禁用状态。
+  setInterviewDraft({
+    surveyId: state.surveyId,
+    dataList: state.dataList,
+    currentQuestionId: state.currentQuestionId,
+    submittedQuestionIds: state.submittedQuestionIds,
+    isFinished: state.isFinished,
+    updatedAt: Date.now(),
+  });
+};
+
+const fillAnswerIntoDataList = (
+  dataList: InterviewItem[],
+  answer: InterviewAnswerSubmitValue,
+): void => {
+  const targetItem = dataList.find(item => item.config?.questionId === answer.questionId);
+
+  if (!targetItem?.config) {
+    return;
+  }
+
+  // 答案直接回填到题目 config.defaultValue，页面恢复时各题型组件可以按默认值还原。
+  targetItem.config.defaultValue = answer.value as AnswerConfig['defaultValue'];
+};
 
 const interviewSlice = createSlice({
-  name: 'interview',
-  initialState,
+  name: INTERVIEW_SLICE_NAME,
+  initialState: initialInterviewState,
   reducers: {
     resetInterviewState(_, action: PayloadAction<string>) {
       const surveyId = action.payload;
@@ -21,7 +55,7 @@ const interviewSlice = createSlice({
       // 避免把用户已经看到/填写过的内容重新拉一遍。
       return {
         // 先铺默认状态，保证不同问卷之间不会继承上一份问卷的临时提交/轮询状态。
-        ...initialState,
+        ...initialInterviewState,
         // 当前问卷 id 是缓存 key 的一部分，也是后续写缓存时必须带上的业务 id。
         surveyId,
         // 缓存中保存的是完整页面 list，恢复后页面可以直接重建历史主持人对话和题目。
