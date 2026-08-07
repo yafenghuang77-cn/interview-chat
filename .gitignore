@@ -6,5 +6,5 @@ node_modules/
 .DS_Store
 .swc
 *.local
-.env.test
-.env.production
+/.env.test
+/.env.production
