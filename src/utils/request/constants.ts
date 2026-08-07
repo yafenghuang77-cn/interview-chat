@@ -1,5 +1,7 @@
-/** 接口基础地址，H5 开发环境默认通过 /api 代理转发。 */
-export const REQUEST_BASE_URL = process.env.TARO_APP_API_BASE_URL || '/api';
+import { requestBaseUrl } from '@/config';
+
+/** 默认后端地址。 */
+export const REQUEST_BASE_URL = requestBaseUrl;
 
 /** 全局请求超时时间，单位毫秒。 */
 export const REQUEST_TIMEOUT = 5000;

@@ -67,6 +67,8 @@ export interface RequestClientConfig {
 /** 单次请求配置；传入的 code/status 数组会覆盖全局配置。 */
 export interface RequestOptions {
   url: string;
+  /** 临时覆盖本次请求的基础 URL，适用于调用其他后端。 */
+  baseUrl?: string;
   method?: RequestMethod;
   data?: unknown;
   header?: RequestHeaders;

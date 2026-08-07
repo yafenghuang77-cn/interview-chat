@@ -1,6 +1,6 @@
 import type { UserConfigExport } from '@tarojs/cli';
 
-const proxyTarget = process.env.TARO_APP_PROXY_TARGET || 'http://localhost:3000';
+import testConfig from '../src/config/test';
 
 export default {
   logger: {
@@ -9,15 +9,20 @@ export default {
   },
   mini: {},
   h5: {
+    router: {
+      mode: 'hash',
+      basename: '/interview-chat',
+      customRoutes: { 'interview-chat/Index/index': 'index' },
+    },
     devServer: {
       proxy: [
         {
-          context: ['/api'],
-          target: proxyTarget,
+          context: [testConfig.url],
+          target: testConfig.domain,
           changeOrigin: true,
           secure: false,
           pathRewrite: {
-            '^/api': '',
+            [`^${testConfig.url}`]: '',
           },
         },
       ],

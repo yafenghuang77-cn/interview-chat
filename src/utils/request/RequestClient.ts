@@ -88,7 +88,7 @@ export class RequestClient {
 
     try {
       const response = await Taro.request<unknown>({
-        url: joinUrl(this.getBaseUrl(), options.url),
+        url: joinUrl(this.getBaseUrl(options), options.url),
         method: options.method || 'GET',
         data: options.data as TaroGeneral.IAnyObject,
         header: await this.getHeaders(options, withToken),
@@ -136,7 +136,12 @@ export class RequestClient {
     }
   }
 
-  private getBaseUrl(): string {
+  /** 单次请求可覆盖全局基础 URL，适用于调用其他后端。 */
+  private getBaseUrl(options: RequestOptions): string {
+    if (options.baseUrl !== undefined) {
+      return options.baseUrl;
+    }
+
     return typeof this.config.baseUrl === 'function'
       ? this.config.baseUrl()
       : this.config.baseUrl || '';

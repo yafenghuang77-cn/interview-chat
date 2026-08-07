@@ -3,6 +3,11 @@ import type { UserConfigExport } from '@tarojs/cli';
 export default {
   mini: {},
   h5: {
+    router: {
+      mode: 'hash',
+      basename: '/interview-chat',
+      customRoutes: { 'interview-chat/Index/index': 'index' },
+    },
     compile: {
       include: [
         // 确保产物为 es5

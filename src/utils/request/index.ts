@@ -72,7 +72,7 @@ export const handleTokenExpired = async (error: RequestError): Promise<void> => 
 
 /** 当前项目的请求客户端配置，code/status/token 均从公共常量读取。 */
 export const requestConfig: RequestClientConfig = {
-  // 所有相对路径接口都会拼接 baseUrl；单次请求未指定 timeout 时使用 5 秒全局超时。
+  // 所有相对路径接口都会拼接默认 URL；单次请求可通过 baseUrl 调用其他后端。
   baseUrl: REQUEST_BASE_URL,
   timeout: REQUEST_TIMEOUT,
 
