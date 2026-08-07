@@ -25,15 +25,15 @@
     "build:qq": "taro build --type qq",
     "build:jd": "taro build --type jd",
     "build:harmony-hybrid": "taro build --type harmony-hybrid",
-    "dev:weapp": "npm run build:weapp -- --watch",
-    "dev:swan": "npm run build:swan -- --watch",
-    "dev:alipay": "npm run build:alipay -- --watch",
-    "dev:tt": "npm run build:tt -- --watch",
-    "dev:h5": "npm run build:h5 -- --watch",
-    "dev:rn": "npm run build:rn -- --watch",
-    "dev:qq": "npm run build:qq -- --watch",
-    "dev:jd": "npm run build:jd -- --watch",
-    "dev:harmony-hybrid": "npm run build:harmony-hybrid -- --watch"
+    "dev:weapp": "npm run build:weapp -- --watch --mode test",
+    "dev:swan": "npm run build:swan -- --watch --mode test",
+    "dev:alipay": "npm run build:alipay -- --watch --mode test",
+    "dev:tt": "npm run build:tt -- --watch --mode test",
+    "dev:h5": "npm run build:h5 -- --watch --mode test",
+    "dev:rn": "npm run build:rn -- --watch --mode test",
+    "dev:qq": "npm run build:qq -- --watch --mode test",
+    "dev:jd": "npm run build:jd -- --watch --mode test",
+    "dev:harmony-hybrid": "npm run build:harmony-hybrid -- --watch --mode test"
   },
   "browserslist": {
     "development": [

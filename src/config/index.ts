@@ -1,5 +1,3 @@
-import productionConfig from './production';
-import testConfig from './test';
 import type { EnvironmentConfig } from './types';
 
 /** 项目支持的运行环境。 */
@@ -30,14 +28,11 @@ const joinUrl = (domain: string, url: string): string => {
   return `${domain.replace(/\/$/, '')}/${url.replace(/^\//, '')}`;
 };
 
-/** 所有环境配置集中映射，新增环境时需要同步补充对应配置文件。 */
-const environmentConfigs: Record<AppEnvironment, EnvironmentConfig> = {
-  [APP_ENVIRONMENT.TEST]: testConfig,
-  [APP_ENVIRONMENT.PRODUCTION]: productionConfig,
+/** 当前 mode 对应的 .env 文件会提供后端域名和接口基础路径。 */
+export const environmentConfig: EnvironmentConfig = {
+  domain: process.env.TARO_APP_DOMAIN || '',
+  url: process.env.TARO_APP_URL || '',
 };
-
-/** 当前构建环境对应的后端配置。 */
-export const environmentConfig = environmentConfigs[environment];
 
 /**
  * 开发环境的 H5 请求使用相对路径并由 devServer 代理；其他场景直接使用后端域名。

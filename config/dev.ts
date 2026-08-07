@@ -1,6 +1,11 @@
 import type { UserConfigExport } from '@tarojs/cli';
 
-import testConfig from '../src/config/test';
+const proxyUrl = process.env.TARO_APP_URL;
+const proxyTarget = process.env.TARO_APP_DOMAIN;
+
+if (!proxyUrl || !proxyTarget) {
+  throw new Error('测试环境缺少 TARO_APP_URL 或 TARO_APP_DOMAIN 配置');
+}
 
 export default {
   logger: {
@@ -17,12 +22,12 @@ export default {
     devServer: {
       proxy: [
         {
-          context: [testConfig.url],
-          target: testConfig.domain,
+          context: [proxyUrl],
+          target: proxyTarget,
           changeOrigin: true,
           secure: false,
           pathRewrite: {
-            [`^${testConfig.url}`]: '',
+            [`^${proxyUrl}`]: '',
           },
         },
       ],

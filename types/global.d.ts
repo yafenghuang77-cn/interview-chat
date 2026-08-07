@@ -25,5 +25,9 @@ declare namespace NodeJS {
     TARO_APP_ID: string;
     /** 当前业务环境 */
     TARO_APP_ENV?: 'test' | 'production';
+    /** 当前环境的后端域名 */
+    TARO_APP_DOMAIN?: string;
+    /** 当前环境的接口基础路径 */
+    TARO_APP_URL?: string;
   }
 }
