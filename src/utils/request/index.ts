@@ -48,8 +48,8 @@ export const getToken = (): string | null => {
 };
 
 /** 登录成功后保存 token。 */
-export const setToken = (token: string): void => {
-  storageManager.set(TOKEN_STORAGE_KEY, token);
+export const setToken = (token: string, expiresIn?: number | string | null): void => {
+  storageManager.setStorageSync(TOKEN_STORAGE_KEY, token, expiresIn);
   Taro.removeStorageSync(TOKEN_STORAGE_KEY);
 };
 
@@ -104,6 +104,10 @@ export const requestConfig: RequestClientConfig = {
   defaultHeaders: {
     Accept: 'application/json',
     'Content-Type': 'application/json',
+    // clientInfo: {
+    //   client_key: 'kbaptkJGtByWrQaP',
+    //   client_sec: 'jkJrRIacBwcpK68d',
+    // },
   },
 
   // withToken 默认为 true。存在 token 且调用方未手动设置同名请求头时，自动注入：

@@ -39,6 +39,6 @@ export const REQUEST_PARSE_ERROR_MESSAGE = '响应数据格式异常，请稍后
 /** token 的本地缓存键和请求头配置。 */
 export const TOKEN_STORAGE_KEY = 'token';
 
-export const TOKEN_HEADER_NAME = 'Authorization';
+export const TOKEN_HEADER_NAME = 'X-RpChat-Token';
 
-export const TOKEN_HEADER_PREFIX = 'Bearer';
+export const TOKEN_HEADER_PREFIX = '';
