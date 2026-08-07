@@ -12,7 +12,7 @@ function App({ children }: PropsWithChildren<unknown>) {
   // });
 
   // children 是将要会渲染的页面
-  return { children };
+  return children;
   // return <Provider store={store}>{children}</Provider>;
 }
 
